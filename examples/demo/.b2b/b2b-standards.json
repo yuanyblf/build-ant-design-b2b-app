@@ -1,0 +1,197 @@
+{
+  "$schemaVersion": 1,
+  "designSource": {
+    "name": "腾讯 CoDesign 设计规范",
+    "projectUrl": "https://codesign.qq.com/app/s/714423819152360",
+    "projectName": "后台规范",
+    "viewModes": ["design", "inspect"],
+    "urls": [
+      "https://codesign.qq.com/app/s/714423819152360",
+      "https://codesign.qq.com/s/714423819152360/714423776438751/presentation",
+      "https://codesign.qq.com/s/714423819152360/714423777461669/presentation",
+      "https://codesign.qq.com/s/714423819152360/714423778387638/presentation",
+      "https://codesign.qq.com/s/714423819152360/714423779338839/presentation",
+      "https://codesign.qq.com/s/714423819152360/714423780316326/presentation",
+      "https://codesign.qq.com/s/714423819152360/714423781313690/presentation",
+      "https://codesign.qq.com/s/714423819152360/714423782415875/presentation",
+      "https://codesign.qq.com/s/714423819152360/714423783573907/presentation"
+    ],
+    "syncStatus": "verified",
+    "verifiedPages": 8,
+    "totalPages": 8,
+    "lastChecked": "2026-08-15"
+  },
+  "product": {
+    "locale": "zh-CN",
+    "density": "middle",
+    "contentMaxWidth": 1440,
+    "pageGutter": 16,
+    "pageGutterCompact": 16
+  },
+  "theme": {
+    "token": {
+      "colorPrimary": "#1677ff",
+      "colorSuccess": "#52c41a",
+      "colorWarning": "#faad14",
+      "colorError": "#ff4d4f",
+      "colorInfo": "#1677ff",
+      "colorText": "#171A1D",
+      "colorTextSecondary": "#747677",
+      "colorTextTertiary": "#A2A3A5",
+      "colorTextQuaternary": "#C8C8C9",
+      "borderRadius": 6,
+      "fontSize": 14,
+      "controlHeight": 32,
+      "wireframe": false
+    },
+    "components": {
+      "Layout": { "headerBg": "#FFFFFF", "siderBg": "#FFFFFF", "bodyBg": "#F5F6F8", "headerHeight": 56 },
+      "Menu": { "itemHeight": 40, "itemBorderRadius": 6, "itemMarginInline": 8 },
+      "Table": { "cellPaddingBlock": 12, "cellPaddingInline": 12 },
+      "Form": { "itemMarginBottom": 20 },
+      "Modal": { "titleFontSize": 16 },
+      "Button": { "paddingInline": 15 },
+      "Card": { "paddingLG": 24 }
+    }
+  },
+  "typography": {
+    "h1": { "fontSize": 24, "fontWeights": ["regular", "bold"] },
+    "h2": { "fontSize": 18, "fontWeights": ["regular", "bold"] },
+    "modalAndTab": { "fontSize": 16, "fontWeights": ["regular", "bold"] },
+    "description": { "fontSize": 14, "fontWeights": ["regular", "bold"] },
+    "footnote": { "fontSize": 12, "fontWeights": ["regular", "bold"] }
+  },
+  "layout": {
+    "pattern": "top-app-left-app-menu-content",
+    "topLevelType": "application",
+    "leftNavigationType": "application-menu",
+    "sidebarTitleContent": "none",
+    "navigationMaxDepth": 2,
+    "applicationDirectVisibleMax": 4,
+    "applicationOverflowMode": "categorized-hover-card",
+    "applicationCardTrigger": "hover",
+    "switchApplicationLoadsDefaultPage": true,
+    "menuIconsRequired": true,
+    "logoWidth": 224,
+    "sidebarWidth": 224,
+    "sidebarCollapsedWidth": 64,
+    "stickyPageHeader": false,
+    "breadcrumb": true
+  },
+  "spacing": {
+    "unit": 4,
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32
+  },
+  "border": {
+    "color": "#E8E9EB",
+    "width": 1,
+    "style": "solid"
+  },
+  "table": {
+    "pageSize": 20,
+    "pageSizeOptions": [10, 20, 50, 100],
+    "showSizeChanger": true,
+    "stickyHeader": true,
+    "rowSelectionPreserve": true,
+    "actionsMaxVisible": 3,
+    "emptyText": "暂无数据",
+    "fixedActionColumn": true,
+    "resizableLongContentColumn": true
+  },
+  "form": {
+    "layout": "vertical",
+    "labelWrap": true,
+    "requiredMark": true,
+    "validateTrigger": "onBlur",
+    "drawerWidth": 560,
+    "modalWidth": 640,
+    "unsavedChangesGuard": true
+  },
+  "feedback": {
+    "successDurationSeconds": 3,
+    "errorDurationSeconds": 5,
+    "confirmDestructiveActions": true,
+    "showRequestIdOnError": true,
+    "tooltipMaxWidth": 300,
+    "tooltipRecommendedMaxLines": 2
+  },
+  "components": {
+    "primaryButtonMaxPerModule": 1,
+    "primaryActionPosition": "left",
+    "buttonFallbackEmphasis": "secondary",
+    "buttonStates": ["default", "hover", "active", "disabled", "loading"],
+    "buttonPatterns": ["plain", "dropdown", "leadingIcon"],
+    "dropdownPatterns": ["simple", "multiple", "grouped", "withIcon", "withDescription"],
+    "toastPatterns": ["plain", "withIcon", "success", "error", "loading", "closable"],
+    "snackbarActionable": true
+  },
+  "pagePatterns": {
+    "menuDefaultTarget": "list",
+    "listCapabilities": ["query", "create", "detail", "rowActions", "batchActions"],
+    "list": {
+      "sections": ["query", "table"],
+      "pageOrder": ["breadcrumb", "title", "query", "table"],
+      "breadcrumbSeparator": ">",
+      "titleSubtitleInline": true,
+      "queryLabelControlLayout": true,
+      "queryButtons": ["查询", "重置"],
+      "queryGridColumns": 4,
+      "queryActionSlots": 1,
+      "collapseThreshold": 3,
+      "showTableTitle": false,
+      "tableActionsPosition": "header-left",
+      "queryOrder": "table-column-order",
+      "dateRangeDefault": true,
+      "dateRangeRequired": false,
+      "requiredHint": "tooltip-on-query",
+      "linkNavigableContent": true,
+      "longContent": "show-all-unless-specified"
+    },
+    "formTypes": ["basic", "step", "advanced"],
+    "advancedFormStickyFooter": true,
+    "detailTypes": ["basic", "advanced"],
+    "detailColumns": 3,
+    "advancedDetailHeader": true,
+    "advancedDetailBreadcrumbSeparateRow": true,
+    "advancedDetailActionsInlineWithTitle": true,
+    "advancedDetailPrimaryActionPosition": "left",
+    "cards": {
+      "density": "compact",
+      "mediaRatio": 2,
+      "contentRatio": 1,
+      "dataCardLayout": "data-left-icon-right",
+      "dataTitleFontSize": 14,
+      "dataValueFontSize": 24,
+      "dataValueFontWeight": "regular",
+      "titleWrap": false,
+      "summaryMaxLines": 2
+    },
+    "modal": {
+      "requiredMark": true,
+      "fieldHelpRequired": true,
+      "cancelText": "取消",
+      "confirmText": "确认",
+      "confirmOnLeft": true
+    },
+    "createEditSurface": {
+      "modalMaxFields": 6,
+      "drawerMaxFields": 16,
+      "complexContentEscalates": true
+    },
+    "detailSurface": {
+      "modalMaxFields": 8,
+      "drawerMaxFields": 20,
+      "complexContentEscalates": true
+    },
+    "preserveListContext": true
+  },
+  "accessibility": {
+    "minimumTargetSize": 32,
+    "requireVisibleFocus": true,
+    "respectReducedMotion": true
+  }
+}

@@ -1,0 +1,10 @@
+---
+description: Ant Design B 端应用、后台页面和业务原型统一规范
+globs:
+  - "**/*.{ts,tsx,css,json,md}"
+alwaysApply: false
+---
+
+处理 React、TypeScript、Ant Design、B 端后台或业务原型任务时，先完整读取仓库根目录 `SKILL.md`，再按其中的任务路由读取 `references/` 文档。
+
+使用 `assets/b2b-standards.json` 作为默认规范，使用 `scripts/apply_standards.py` 校验和生成配置。不要在本规则中另行定义设计 Token 或页面规范。

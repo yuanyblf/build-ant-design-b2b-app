@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ant Design B端应用框架"
+  short_description: "按可配置规范搭建和扩展 Ant Design B端应用"
+  default_prompt: "使用 $build-ant-design-b2b-app，按照可配置中文规范把我的业务需求实现为 Ant Design B 端功能。"
