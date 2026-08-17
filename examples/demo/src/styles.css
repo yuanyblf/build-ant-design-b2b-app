@@ -38,10 +38,10 @@ body { margin: 0; min-width: 320px; }
 .list-page-heading { display: grid; gap: 10px; }
 .list-page-heading h1.ant-typography { margin: 0; }
 .search-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 20px; align-items: center; }
-.search-field { display: grid; grid-template-columns: 88px minmax(0, 1fr); align-items: center; gap: 8px; }
-.search-field-label { text-align: right; white-space: nowrap; }
-.search-actions { display: flex; justify-content: flex-end; white-space: nowrap; }
-.search-fields-collapsed > .search-field:nth-child(n+4) { display: none; }
+.search-field { min-width: 0; display: grid; grid-template-columns: 88px minmax(0, 1fr); align-items: center; gap: 8px; }
+.search-field-label { width: 88px; text-align: right; white-space: nowrap; }
+.search-field > :not(.search-field-label) { min-width: 0; width: 100%; }
+.search-actions { min-width: max-content; display: flex; align-items: center; justify-content: flex-start; white-space: nowrap; }
 .batch-toolbar { margin-bottom: 16px; padding: 10px 12px; background: #f0f6ff; border: 1px solid #cfe3ff; border-radius: 6px; }
 .table-link { padding-left: 0; font-weight: 600; }
 .table-toolbar { display: flex; justify-content: flex-start; align-items: center; min-height: 32px; margin-bottom: 16px; }
@@ -79,6 +79,10 @@ body { margin: 0; min-width: 320px; }
 .tree-search { margin-bottom: 16px; }
 .group-description { margin: 20px 0 16px; }
 .advanced-form-page { padding-bottom: 72px; }
+.edit-form .ant-form-item-row { flex-wrap: nowrap; align-items: flex-start; }
+.edit-form .ant-form-item-label { flex: 0 0 112px; max-width: 112px; white-space: nowrap; }
+.edit-form .ant-form-item-label > label { white-space: nowrap; }
+.edit-form .ant-form-item-control { min-width: 0; flex: 1 1 auto; }
 .sticky-form-actions { position: sticky; z-index: 5; bottom: 0; margin-top: 16px; padding: 14px 16px; background: rgba(255,255,255,.96); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 -4px 16px rgba(0,0,0,.06); }
 .training-card { cursor: pointer; }
 .care-confirm-card { background: #fafafa; }
@@ -86,4 +90,4 @@ body { margin: 0; min-width: 320px; }
 .template-copy { min-width: 0; flex: 1; }
 .template-copy h4.ant-typography { margin: 4px 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .template-copy p.ant-typography { min-height: 44px; margin-bottom: 8px; }
-@media (max-width: 900px) { .app-content { padding: var(--page-gutter-compact); } .app-header { padding: 0 var(--page-gutter-compact); } .brand { width: auto; flex-basis: auto; } .brand-logo { width: 84px; height: 29px; } .user-copy { display: none; } .header-user { flex-basis: auto; } .application-nav { justify-content: flex-start; } .application-menu { display: none; } .application-popover { width: min(520px, calc(100vw - 32px)); } .application-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .app-sider { display: none; } .chart-row { grid-template-columns: 70px 1fr; } .chart-row strong { display: none; } .search-fields { grid-template-columns: 1fr; } .search-field { grid-template-columns: 76px minmax(0, 1fr); } .search-actions { justify-content: flex-start; padding-left: 84px; } }
+@media (max-width: 900px) { .app-content { padding: var(--page-gutter-compact); } .app-header { padding: 0 var(--page-gutter-compact); } .brand { width: auto; flex-basis: auto; } .brand-logo { width: 84px; height: 29px; } .user-copy { display: none; } .header-user { flex-basis: auto; } .application-nav { justify-content: flex-start; } .application-menu { display: none; } .application-popover { width: min(520px, calc(100vw - 32px)); } .application-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .app-sider { display: none; } .chart-row { grid-template-columns: 70px 1fr; } .chart-row strong { display: none; } .search-fields { grid-template-columns: 1fr; } .search-field { grid-template-columns: 76px minmax(0, 1fr); } .search-actions { justify-content: flex-start; padding-left: 84px; } .edit-form .ant-form-item-row { flex-wrap: wrap; } .edit-form .ant-form-item-label, .edit-form .ant-form-item-control { flex: 0 0 100%; max-width: 100%; } .edit-form .ant-form-item-label { padding-bottom: 8px; text-align: left; } }

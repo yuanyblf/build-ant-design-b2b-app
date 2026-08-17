@@ -241,6 +241,11 @@ export const b2bStandards = {
       "queryGridColumns": 4,
       "queryActionSlots": 1,
       "collapseThreshold": 3,
+      "queryItemLayout": "label-control-inline",
+      "queryLabelWidth": 88,
+      "queryLabelWrap": false,
+      "queryControlWidth": "fill",
+      "queryActionsAlign": "left-center",
       "showTableTitle": false,
       "tableActionsPosition": "header-left",
       "queryOrder": "table-column-order",
@@ -255,6 +260,11 @@ export const b2bStandards = {
       "step",
       "advanced"
     ],
+    "formItemLayout": "label-control-inline",
+    "formLabelWidth": 112,
+    "formLabelWrap": false,
+    "formControlWidth": "fill",
+    "formNarrowLayout": "vertical",
     "advancedFormStickyFooter": true,
     "detailTypes": [
       "basic",
