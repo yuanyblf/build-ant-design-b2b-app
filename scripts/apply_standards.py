@@ -138,6 +138,17 @@ def validate(data: dict[str, Any]) -> None:
     collapse_threshold = list_pattern.get("collapseThreshold")
     if collapse_threshold != 3:
         fail("pagePatterns.list.collapseThreshold must be 3 when buttons occupy one of four columns")
+    if list_pattern.get("queryItemLayout") != "label-control-inline":
+        fail("pagePatterns.list.queryItemLayout must be label-control-inline")
+    label_width = list_pattern.get("queryLabelWidth")
+    if not isinstance(label_width, int) or label_width <= 0:
+        fail("pagePatterns.list.queryLabelWidth must be a positive integer")
+    if list_pattern.get("queryLabelWrap") is not False:
+        fail("pagePatterns.list.queryLabelWrap must be false")
+    if list_pattern.get("queryControlWidth") != "fill":
+        fail("pagePatterns.list.queryControlWidth must be fill")
+    if list_pattern.get("queryActionsAlign") != "left-center":
+        fail("pagePatterns.list.queryActionsAlign must be left-center")
     if list_pattern.get("showTableTitle") is not False:
         fail("pagePatterns.list.showTableTitle must be false")
     if list_pattern.get("tableActionsPosition") != "header-left":
@@ -150,6 +161,17 @@ def validate(data: dict[str, Any]) -> None:
         fail("pagePatterns.list.longContent has an unsupported value")
     if patterns.get("formTypes") != ["basic", "step", "advanced"]:
         fail("pagePatterns.formTypes must contain basic, step, and advanced")
+    if patterns.get("formItemLayout") != "label-control-inline":
+        fail("pagePatterns.formItemLayout must be label-control-inline")
+    form_label_width = patterns.get("formLabelWidth")
+    if not isinstance(form_label_width, int) or form_label_width <= 0:
+        fail("pagePatterns.formLabelWidth must be a positive integer")
+    if patterns.get("formLabelWrap") is not False:
+        fail("pagePatterns.formLabelWrap must be false")
+    if patterns.get("formControlWidth") != "fill":
+        fail("pagePatterns.formControlWidth must be fill")
+    if patterns.get("formNarrowLayout") != "vertical":
+        fail("pagePatterns.formNarrowLayout must be vertical")
     if patterns.get("detailTypes") != ["basic", "advanced"]:
         fail("pagePatterns.detailTypes must contain basic and advanced")
     detail_columns = patterns.get("detailColumns")

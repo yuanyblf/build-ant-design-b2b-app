@@ -303,6 +303,11 @@
   "queryGridColumns": 4,
   "queryActionSlots": 1,
   "collapseThreshold": 3,
+  "queryItemLayout": "label-control-inline",
+  "queryLabelWidth": 88,
+  "queryLabelWrap": false,
+  "queryControlWidth": "fill",
+  "queryActionsAlign": "left-center",
   "showTableTitle": false,
   "tableActionsPosition": "header-left",
   "queryOrder": "table-column-order",
@@ -313,6 +318,11 @@
   "longContent": "show-all-unless-specified"
 },
 "formTypes": ["basic", "step", "advanced"],
+"formItemLayout": "label-control-inline",
+"formLabelWidth": 112,
+"formLabelWrap": false,
+"formControlWidth": "fill",
+"formNarrowLayout": "vertical",
 "advancedFormStickyFooter": true,
 "detailTypes": ["basic", "advanced"],
 "detailColumns": 3,
@@ -349,6 +359,11 @@
 - `list.queryGridColumns`：桌面端查询区每行最多 4 项。
 - `list.queryActionSlots`：按钮组占用 1 项。
 - `list.collapseThreshold`：默认收起时最多展示 3 个查询字段，剩余第 4 项留给按钮组；超过 3 个查询字段时出现“展开／收起”。
+- `list.queryItemLayout`：固定为 `label-control-inline`，表示字段名称和输入控件必须同行，不能上下换行。
+- `list.queryLabelWidth`：查询标签固定宽度，单位为 px，默认 88；字段名较长时应优化文案，不通过换行撑高查询项。
+- `list.queryLabelWrap`：固定为 `false`，查询标签禁止换行。
+- `list.queryControlWidth`：固定为 `fill`，控件填满标签之外的剩余空间，同时允许在网格内收缩。
+- `list.queryActionsAlign`：固定为 `left-center`，按钮组在自己的网格项内左对齐、垂直居中。
 - `list.showTableTitle`：列表页表格区不展示独立标题。
 - `list.tableActionsPosition`：表格级操作位于表格上方左侧，并与第一列表头左边界对齐。
 - `list.queryOrder`：默认按表格列顺序排列查询项；特殊场景可改成 `custom`，并在需求中列明顺序。
@@ -358,6 +373,11 @@
 - `list.linkNavigableContent`：可跳转内容使用链接形式。
 - `list.longContent`：默认完整展示；需要统一截断时可改为 `ellipsis-with-tooltip`。
 - `advancedFormStickyFooter`：高级表单操作区是否吸底。
+- `formItemLayout`：固定为 `label-control-inline`，新建和编辑表单在桌面端保持标签与控件同行。
+- `formLabelWidth`：同一表单的标签固定宽度，单位为 px，默认 112。
+- `formLabelWrap`：固定为 `false`，字段标签禁止换行；字段名过长时应优化文案或增加说明。
+- `formControlWidth`：固定为 `fill`，输入控件占满标签之外的剩余空间并允许收缩。
+- `formNarrowLayout`：窄屏时统一切换为 `vertical`；必须整张表单一起切换，不能单个字段随机换行。
 - `detailColumns`：详情字段桌面端每行列数，可配置为 1、2 或 3，默认 3。
 - `advancedDetailHeader`：高级详情是否使用突出状态、金额和操作的统一 Header。
 - `advancedDetailBreadcrumbSeparateRow`：高级详情面包屑单独占一行。
