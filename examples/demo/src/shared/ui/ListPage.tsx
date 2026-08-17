@@ -1,4 +1,4 @@
-import { Children, useState, type ReactNode } from 'react';
+import { Children, useState, type CSSProperties, type ReactNode } from 'react';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Card, Flex, Space, Typography } from 'antd';
 
@@ -13,10 +13,15 @@ export function SearchField({ label, children }: { label: string; children: Reac
   return <div className="search-field"><Typography.Text className="search-field-label">{label}</Typography.Text>{children}</div>;
 }
 
-export function SearchPanel({ children, fieldCount, onSearch, onReset }: { children: ReactNode; fieldCount: number; onSearch: () => void; onReset: () => void }) {
-  const collapsible = fieldCount > 3;
-  const [expanded, setExpanded] = useState(false);
+export function SearchPanel({ children, onSearch, onReset }: { children: ReactNode; onSearch: () => void; onReset: () => void }) {
   const fields = Children.toArray(children);
+  const collapsible = fields.length > 3;
+  const [expanded, setExpanded] = useState(false);
   const visibleFields = collapsible && !expanded ? fields.slice(0, 3) : fields;
-  return <Card className="search-card"><div className="search-fields">{visibleFields}<div className="search-actions"><Space wrap={false}><Button type="primary" onClick={onSearch}>查询</Button><Button onClick={onReset}>重置</Button>{collapsible && <Button type="link" icon={expanded ? <UpOutlined /> : <DownOutlined />} onClick={() => setExpanded(value => !value)}>{expanded ? '收起' : '展开'}</Button>}</Space></div></div></Card>;
+  const actionRows = {
+    '--search-action-row-4': Math.floor(visibleFields.length / 4) + 1,
+    '--search-action-row-2': Math.floor(visibleFields.length / 2) + 1,
+    '--search-action-row-1': visibleFields.length + 1,
+  } as CSSProperties;
+  return <Card className="search-card"><div className="search-fields" style={actionRows}>{visibleFields}<div className="search-actions"><Space wrap={false}><Button type="primary" onClick={onSearch}>查询</Button><Button onClick={onReset}>重置</Button>{collapsible && <Button type="link" icon={expanded ? <UpOutlined /> : <DownOutlined />} onClick={() => setExpanded(value => !value)}>{expanded ? '收起' : '展开'}</Button>}</Space></div></div></Card>;
 }
