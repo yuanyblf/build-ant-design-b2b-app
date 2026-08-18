@@ -317,7 +317,39 @@
   "dateRangeRequired": false,
   "requiredHint": "tooltip-on-query",
   "linkNavigableContent": true,
-  "longContent": "show-all-unless-specified"
+  "longContent": "show-all-unless-specified",
+  "leftTreeFilter": {
+    "applicableTo": "hierarchical-dimension",
+    "panel": {
+      "width": 240,
+      "gap": 16,
+      "paddingBlock": 16,
+      "paddingInline": 12,
+      "borderRadius": 8,
+      "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.06)",
+      "sticky": true,
+      "stickyTop": 80,
+      "viewportOffset": 160
+    },
+    "selectionMode": "single",
+    "searchable": true,
+    "preserveAncestorPathOnSearch": true,
+    "showLine": true,
+    "showLeafIcon": false,
+    "blockNode": true,
+    "titleOverflow": "ellipsis-with-tooltip",
+    "collapsible": true,
+    "preserveStateOnCollapse": true,
+    "collapsedTriggerPosition": "content-top-left",
+    "showSelectedStateWhenCollapsed": true,
+    "footerCreateAction": true,
+    "nodeActions": ["edit", "add-child", "delete"],
+    "destructiveActionConfirm": true,
+    "mobileBreakpoint": 991,
+    "mobileLayout": "stack",
+    "syncSelectionToUrl": true,
+    "resetRowSelectionOnChange": true
+  }
 },
 "formTypes": ["basic", "step", "advanced"],
 "formItemLayout": "label-control-inline",
@@ -379,6 +411,20 @@
 - `list.requiredHint`：必填查询项为空时，点击查询后使用 Tooltip 提示，不显示星号。
 - `list.linkNavigableContent`：可跳转内容使用链接形式。
 - `list.longContent`：默认完整展示；需要统一截断时可改为 `ellipsis-with-tooltip`。
+- `list.leftTreeFilter`：可选配置；部门、组织、分类等层级维度需要左树右列表时使用，未使用该模式的既有列表可以不配置。
+- `list.leftTreeFilter.panel`：控制 240px 面板宽度、16px 左右间距、内边距、8px 圆角、阴影、80px 吸顶位置和 160px 视口高度扣减值。尺寸可按产品规范调整，但必须为正数。
+- `list.leftTreeFilter.selectionMode`：固定为 `single`；树是单一层级维度筛选，不在同一树中混合多选语义。
+- `list.leftTreeFilter.preserveAncestorPathOnSearch`：固定为 `true`；搜索命中子节点时保留并展开祖先路径。
+- `list.leftTreeFilter.showLine`／`showLeafIcon`／`blockNode`：使用连线和整行点击，不显示叶子图标。
+- `list.leftTreeFilter.titleOverflow`：固定为 `ellipsis-with-tooltip`，长节点名省略并提供完整 Tooltip。
+- `list.leftTreeFilter.preserveStateOnCollapse`：收起后保留搜索词、展开节点和当前选择；展开按钮位于主内容左上，并为其预留空间。
+- `list.leftTreeFilter.showSelectedStateWhenCollapsed`：收起后仍展示“已筛选「名称」”提示和选中色。
+- `list.leftTreeFilter.footerCreateAction`：布尔值；为 `true` 时模式支持根级新增入口，具体页面没有权限时仍由业务层隐藏。
+- `list.leftTreeFilter.nodeActions`：可从 `edit`、`add-child`、`delete` 中配置不重复的子集，并保持该顺序；页面再按权限隐藏不可用项。
+- `list.leftTreeFilter.destructiveActionConfirm`：配置了 `delete` 时必须为 `true`，删除使用危险样式并二次确认；菜单点击不得触发节点选择。
+- `list.leftTreeFilter.mobileBreakpoint`／`mobileLayout`：固定为 991 和 `stack`，不超过 991px 时切换为上下堆叠布局。
+- `list.leftTreeFilter.syncSelectionToUrl`：树选择使用稳定业务 ID 同步到 URL。
+- `list.leftTreeFilter.resetRowSelectionOnChange`：树筛选变化后回到第一页并清空已选表格行。
 - `advancedFormStickyFooter`：高级表单操作区是否吸底。
 - `formItemLayout`：固定为 `label-control-inline`，新建和编辑表单在桌面端保持标签与控件同行。
 - `formLabelWidth`：同一表单的标签固定宽度，单位为 px，默认 112。

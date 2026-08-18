@@ -30,6 +30,67 @@ def fail(message: str) -> None:
     raise ValueError(message)
 
 
+def validate_left_tree_filter(left_tree_filter: Any) -> None:
+    if not isinstance(left_tree_filter, dict):
+        fail("pagePatterns.list.leftTreeFilter must be an object")
+    if left_tree_filter.get("applicableTo") != "hierarchical-dimension":
+        fail("pagePatterns.list.leftTreeFilter.applicableTo must be hierarchical-dimension")
+    panel = left_tree_filter.get("panel")
+    if not isinstance(panel, dict):
+        fail("pagePatterns.list.leftTreeFilter.panel must be an object")
+    for name in ("width", "gap", "paddingBlock", "paddingInline", "borderRadius", "stickyTop", "viewportOffset"):
+        value = panel.get(name)
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+            fail(f"pagePatterns.list.leftTreeFilter.panel.{name} must be a positive number")
+    if not isinstance(panel.get("boxShadow"), str) or not panel["boxShadow"].strip():
+        fail("pagePatterns.list.leftTreeFilter.panel.boxShadow must be a non-empty string")
+    if panel.get("sticky") is not True:
+        fail("pagePatterns.list.leftTreeFilter.panel.sticky must be true")
+    fixed_values = {
+        "selectionMode": "single",
+        "titleOverflow": "ellipsis-with-tooltip",
+        "collapsedTriggerPosition": "content-top-left",
+        "mobileLayout": "stack",
+    }
+    for name, expected in fixed_values.items():
+        if left_tree_filter.get(name) != expected:
+            fail(f"pagePatterns.list.leftTreeFilter.{name} must be {expected}")
+    required_true = (
+        "searchable",
+        "preserveAncestorPathOnSearch",
+        "showLine",
+        "blockNode",
+        "collapsible",
+        "preserveStateOnCollapse",
+        "showSelectedStateWhenCollapsed",
+        "syncSelectionToUrl",
+        "resetRowSelectionOnChange",
+    )
+    for name in required_true:
+        if left_tree_filter.get(name) is not True:
+            fail(f"pagePatterns.list.leftTreeFilter.{name} must be true")
+    if left_tree_filter.get("showLeafIcon") is not False:
+        fail("pagePatterns.list.leftTreeFilter.showLeafIcon must be false")
+    if not isinstance(left_tree_filter.get("footerCreateAction"), bool):
+        fail("pagePatterns.list.leftTreeFilter.footerCreateAction must be a boolean")
+    actions = left_tree_filter.get("nodeActions")
+    allowed_actions = ["edit", "add-child", "delete"]
+    if (
+        not isinstance(actions, list)
+        or not all(isinstance(action, str) for action in actions)
+        or len(actions) != len(set(actions))
+        or any(action not in allowed_actions for action in actions)
+        or actions != [action for action in allowed_actions if action in actions]
+    ):
+        fail("pagePatterns.list.leftTreeFilter.nodeActions must be an ordered unique subset of edit, add-child, delete")
+    if not isinstance(left_tree_filter.get("destructiveActionConfirm"), bool):
+        fail("pagePatterns.list.leftTreeFilter.destructiveActionConfirm must be a boolean")
+    if "delete" in actions and left_tree_filter.get("destructiveActionConfirm") is not True:
+        fail("pagePatterns.list.leftTreeFilter.destructiveActionConfirm must be true when delete is enabled")
+    if left_tree_filter.get("mobileBreakpoint") != 991:
+        fail("pagePatterns.list.leftTreeFilter.mobileBreakpoint must be 991")
+
+
 def validate(data: dict[str, Any]) -> None:
     if data.get("$schemaVersion") != 1:
         fail("$schemaVersion must be 1")
@@ -178,6 +239,9 @@ def validate(data: dict[str, Any]) -> None:
         fail("pagePatterns.list.requiredHint must be tooltip-on-query")
     if list_pattern.get("longContent") not in {"show-all-unless-specified", "ellipsis-with-tooltip"}:
         fail("pagePatterns.list.longContent has an unsupported value")
+    left_tree_filter = list_pattern.get("leftTreeFilter")
+    if left_tree_filter is not None:
+        validate_left_tree_filter(left_tree_filter)
     if patterns.get("formTypes") != ["basic", "step", "advanced"]:
         fail("pagePatterns.formTypes must contain basic, step, and advanced")
     if patterns.get("formItemLayout") != "label-control-inline":
