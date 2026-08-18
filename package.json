@@ -1,0 +1,10 @@
+{
+  "name": "build-ant-design-b2b-app",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "generate:standards": "python3 scripts/apply_standards.py --config assets/b2b-standards.json --check && python3 scripts/generate_design_md.py --config assets/b2b-standards.json --output DESIGN.md && npm --prefix examples/demo run generate:standards",
+    "check:standards": "python3 scripts/apply_standards.py --config assets/b2b-standards.json --check && python3 scripts/generate_design_md.py --config assets/b2b-standards.json --output DESIGN.md --check && npm --prefix examples/demo run check:standards",
+    "build:demo": "npm --prefix examples/demo run build"
+  }
+}

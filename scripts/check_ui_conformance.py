@@ -8,14 +8,18 @@ import json
 import re
 from pathlib import Path
 
+from generate_design_md import render_design_md
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="检查 B2B 页面是否符合强制规范")
     parser.add_argument("--root", type=Path, required=True, help="待检查的前端项目目录")
     parser.add_argument("--config", type=Path, help="默认读取 <root>/.b2b/b2b-standards.json")
+    parser.add_argument("--design", type=Path, help="默认检查 <root>/DESIGN.md")
     args = parser.parse_args()
     root = args.root.resolve()
     config_path = (args.config or root / ".b2b/b2b-standards.json").resolve()
+    design_path = (args.design or root / "DESIGN.md").resolve()
     errors: list[str] = []
 
     try:
@@ -23,6 +27,13 @@ def main() -> int:
     except (OSError, json.JSONDecodeError) as exc:
         print(f"规范检查失败：无法读取配置 {config_path}：{exc}")
         return 1
+
+    try:
+        expected_design = render_design_md(standards, config_path.name)
+        if design_path.read_text(encoding="utf-8") != expected_design:
+            errors.append(f"{design_path} 已过期或被手工修改，请运行 generate:standards")
+    except OSError as exc:
+        errors.append(f"无法读取 {design_path}：{exc}")
 
     conformance = standards.get("conformance") or {}
     form = standards.get("form") or {}
