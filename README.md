@@ -9,6 +9,7 @@
 ```text
 .
 ├── SKILL.md                         # Skill 入口
+├── DESIGN.md                        # 由 JSON 自动生成的中文 Agent 设计入口
 ├── agents/                          # Skill UI 元数据
 ├── AGENTS.md                        # 通用 Agent 入口
 ├── .claude/                         # Claude Code 适配
@@ -69,15 +70,14 @@ npm run build
 examples/demo/.b2b/b2b-standards.json
 ```
 
-在仓库根目录执行：
+产品经理只维护上述 JSON，不直接修改 `DESIGN.md` 或生成的 TypeScript 文件。在仓库根目录执行：
 
 ```bash
-python3 scripts/apply_standards.py \
-  --config examples/demo/.b2b/b2b-standards.json \
-  --out-dir examples/demo/src/shared/design-system/generated
+npm run generate:standards
+npm run check:standards
 ```
 
-不要直接修改 `examples/demo/src/shared/design-system/generated` 下的生成文件。
+第一条命令会生成根 Skill 和 Demo 的 `DESIGN.md`、Ant Design Theme 与 TypeScript 配置；第二条命令会检查生成文件是否过期并执行 UI 规范检查。
 
 ## 发布前验证
 
@@ -85,11 +85,8 @@ python3 scripts/apply_standards.py \
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .
 
-python3 scripts/apply_standards.py \
-  --config assets/b2b-standards.json \
-  --check
-
-cd examples/demo && npm run build
+npm run check:standards
+npm run build:demo
 ```
 
 ## 设计规范来源

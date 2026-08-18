@@ -492,23 +492,32 @@
 
 ## 让修改生效
 
-在项目目录执行：
+产品经理只修改 `.b2b/b2b-standards.json`，不要直接修改 `DESIGN.md` 或生成的 TypeScript 文件。修改后在项目目录执行：
+
+```bash
+npm run generate:standards
+npm run check:standards
+```
+
+第一条命令会校验 JSON，并重新生成 Ant Design Theme、TypeScript 配置和供 Agent 阅读的中文 `DESIGN.md`；第二条命令检查这些产物是否与 JSON 同步，并执行页面规范检查。
+
+如果项目尚未配置 npm 命令，可以直接执行：
 
 ```bash
 python3 scripts/apply_standards.py \
-  --config examples/demo/.b2b/b2b-standards.json \
-  --check
+  --config .b2b/b2b-standards.json \
+  --out-dir src/shared/design-system/generated
 
-python3 scripts/apply_standards.py \
-  --config examples/demo/.b2b/b2b-standards.json \
-  --out-dir examples/demo/src/shared/design-system/generated
+python3 scripts/generate_design_md.py \
+  --config .b2b/b2b-standards.json \
+  --output DESIGN.md
 ```
 
 如果开发服务正在运行，保存后通常会自动刷新；否则重新执行 `npm run dev`。
 
 ## 注意事项
 
-1. 不要直接修改 `examples/demo/src/shared/design-system/generated`，下次生成时会被覆盖。
-2. 修改 JSON 后先运行 `--check`，确认格式和取值合法。
+1. 不要直接修改 `DESIGN.md` 或 `src/shared/design-system/generated`，下次生成时会被覆盖。
+2. `b2b-standards.json` 是唯一需要人工维护的配置文件；修改后运行 `npm run generate:standards`。
 3. 不是所有行为配置都会自动变成样式；业务组件需要读取相应配置。这个 Demo 已接入主题 Token、组件 Token、顶部高度、Logo 宽度、侧栏宽度、边框、内容最大宽度和页面边距。
 4. 新增配置字段时，需要同步更新校验脚本和消费该字段的页面组件。

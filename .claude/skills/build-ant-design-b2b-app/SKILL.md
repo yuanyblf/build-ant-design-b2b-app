@@ -5,7 +5,7 @@ description: 使用 React、TypeScript 和 Ant Design 创建或扩展可配置�
 
 # Claude Code 适配入口
 
-先完整读取仓库根目录 `SKILL.md`，并将其作为本任务的正式 Skill 指令。
+先完整读取仓库根目录 `SKILL.md`；处理 UI 时同时读取根目录自动生成的 `DESIGN.md`，并将二者作为本任务的正式指令。`DESIGN.md` 只由 JSON 生成，禁止手工修改。
 
 随后按根 Skill 的路由说明读取所需 `references/` 文件。不要在本适配文件中推断或复制设计、页面和交互规范。
 

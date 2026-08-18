@@ -30,9 +30,10 @@ description: 使用 React、TypeScript 和 Ant Design 搭建、重构或扩展�
    - 仓库中的 `.b2b/b2b-standards.json`；
    - 仓库中的 `config/b2b-standards.json`；
    - 本 Skill 的 `assets/b2b-standards.json` 默认值。
-3. 使用 `python3 scripts/apply_standards.py --config <配置文件> --check` 校验规范。
-4. 新应用默认采用 React、TypeScript 和 Ant Design；已有项目优先沿用现有技术栈，不为匹配默认值而重构。
-5. 按任务读取所需文档：
+3. 读取项目根目录自动生成的 `DESIGN.md`；它是 JSON 规范面向 Agent 的中文表达，不是第二份配置源。缺失或过期时先重新生成。
+4. 使用 `python3 scripts/apply_standards.py --config <配置文件> --check` 校验规范。
+5. 新应用默认采用 React、TypeScript 和 Ant Design；已有项目优先沿用现有技术栈，不为匹配默认值而重构。
+6. 按任务读取所需文档：
    - 同步设计 Token 或用户提到 CoDesign 时，读取 `references/design-source.md`。
    - 新建基础架构、模块、路由、数据访问或权限时，读取 `references/architecture.md`。
    - 选择和组合页面时，读取 `references/page-patterns.md`。
@@ -110,6 +111,16 @@ python3 scripts/apply_standards.py \
 
 禁止直接修改生成文件；应修改 JSON 后重新生成。
 
+同时生成项目级中文设计入口：
+
+```bash
+python3 scripts/generate_design_md.py \
+  --config .b2b/b2b-standards.json \
+  --output DESIGN.md
+```
+
+若项目提供 `npm run generate:standards`，优先使用该命令一次生成 Theme、TypeScript 配置和 `DESIGN.md`。
+
 ## 实现要求
 
 - 使用 TypeScript 和明确领域类型，不用 `any` 掩盖不确定性。
@@ -127,7 +138,7 @@ python3 scripts/apply_standards.py \
 ## 交付前验证
 
 1. 运行与改动相关的类型检查、Lint 和测试。
-2. 项目包含 React／TSX 页面时，运行 `python3 scripts/check_ui_conformance.py --root <项目目录>`；任何规范违规都必须阻止交付。
+2. 项目包含 React／TSX 页面时，运行 `python3 scripts/check_ui_conformance.py --root <项目目录>`；它同时检查 `DESIGN.md` 是否与 JSON 同步，任何违规都必须阻止交付。
 3. 验证主流程以及加载、空、校验、权限和失败状态。
 4. 检查键盘操作、弹窗关闭后的焦点回归、标签、对比度和窄屏溢出。
 5. 确认设计值来自共享规范，不是散落的无解释字面量。
@@ -141,7 +152,10 @@ python3 scripts/apply_standards.py \
 1. 复制到 `.b2b/b2b-standards.json`。
 2. 修改 Token 或行为配置。
 3. 使用 `--check` 校验。
-4. 重新生成主题文件。
-5. 检查有代表性的列表、表单、详情和危险操作流程。
+4. 运行 `npm run generate:standards`，重新生成主题、TypeScript 配置和 `DESIGN.md`。
+5. 运行 `npm run check:standards`，确认生成文件未过期且页面符合规范。
+6. 检查有代表性的列表、表单、详情和危险操作流程。
+
+`b2b-standards.json` 是唯一需要人工维护的配置源。`DESIGN.md` 只供 Agent 阅读，文件顶部标明自动生成，禁止直接修改。
 
 `references/design-source.md` 登记的 CoDesign 项目入口是在线设计规范总源，8 个演示页是可定位的子页面。先从项目入口核对设计稿数量和版本，再按子页面逐项同步；无法读取页面内容时，不得猜测颜色、字号、间距等数值，应标记为“待同步”。新增规范时，同时更新 JSON、`scripts/apply_standards.py` 中的校验逻辑和对应中文规范文档。调整应用外壳或导航时，必须读取 `references/architecture.md` 中的“统一应用骨架”。

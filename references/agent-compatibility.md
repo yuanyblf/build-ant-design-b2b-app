@@ -17,11 +17,11 @@
 
 ## 适配器要求
 
-1. 先完整读取根 `SKILL.md`，再执行任务。
+1. 先完整读取根 `SKILL.md`；处理 UI 时同时读取自动生成的 `DESIGN.md`，再执行任务。
 2. 按根 Skill 的路由说明读取所需 `references/` 文件。
 3. 使用 `assets/b2b-standards.json` 作为默认规范。
-4. 使用 `scripts/apply_standards.py` 校验和生成配置。
-5. 不在适配器中重新定义 Token、布局、页面和交互规则。
+4. 使用 `scripts/apply_standards.py` 校验和生成配置，使用 `scripts/generate_design_md.py` 从 JSON 更新 `DESIGN.md`。
+5. 不在适配器中重新定义 Token、布局、页面和交互规则；不得手工维护 `DESIGN.md`。
 6. 平台能力与根 Skill 冲突时，遵守更严格的安全和权限规则。
 7. 既有项目实现、平台默认 UI、Agent 生成习惯与根 Skill 业务规范冲突时，以根 Skill、相关引用文档和生效配置为准，主动修正冲突实现，不得静默偏离。
 

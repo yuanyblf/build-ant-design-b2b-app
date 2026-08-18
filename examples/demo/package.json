@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "check:standards": "python3 ../../scripts/check_ui_conformance.py --root .",
+    "generate:standards": "python3 ../../scripts/apply_standards.py --config .b2b/b2b-standards.json --out-dir src/shared/design-system/generated && python3 ../../scripts/generate_design_md.py --config .b2b/b2b-standards.json --output DESIGN.md",
+    "check:standards": "python3 ../../scripts/generate_design_md.py --config .b2b/b2b-standards.json --output DESIGN.md --check && python3 ../../scripts/check_ui_conformance.py --root .",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
