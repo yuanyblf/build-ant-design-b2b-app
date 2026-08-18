@@ -11,6 +11,7 @@ from typing import Any
 
 REQUIRED_SECTIONS = {
     "product",
+    "conformance",
     "theme",
     "layout",
     "table",
@@ -36,6 +37,18 @@ def validate(data: dict[str, Any]) -> None:
     if missing:
         fail(f"missing sections: {', '.join(missing)}")
 
+    conformance = data["conformance"]
+    if not isinstance(conformance, dict):
+        fail("conformance must be an object")
+    if conformance.get("mode") != "strict":
+        fail("conformance.mode must be strict")
+    if conformance.get("conflictPolicy") != "skill-wins":
+        fail("conformance.conflictPolicy must be skill-wins")
+    if conformance.get("allowSilentDeviation") is not False:
+        fail("conformance.allowSilentDeviation must be false")
+    if conformance.get("requireAutomatedCheck") is not True:
+        fail("conformance.requireAutomatedCheck must be true")
+
     source = data.get("designSource")
     if not isinstance(source, dict) or source.get("projectUrl") != "https://codesign.qq.com/app/s/714423819152360":
         fail("designSource.projectUrl must point to the authoritative CoDesign project")
@@ -44,8 +57,10 @@ def validate(data: dict[str, Any]) -> None:
     if density not in {"small", "middle", "large"}:
         fail("product.density must be small, middle, or large")
     layout = data["form"].get("layout")
-    if layout not in {"horizontal", "vertical", "inline"}:
-        fail("form.layout must be horizontal, vertical, or inline")
+    if layout != "horizontal":
+        fail("form.layout must be horizontal")
+    if data["form"].get("labelWrap") is not False:
+        fail("form.labelWrap must be false")
 
     positive_paths = [
         ("product.contentMaxWidth", data["product"].get("contentMaxWidth")),
@@ -147,8 +162,12 @@ def validate(data: dict[str, Any]) -> None:
         fail("pagePatterns.list.queryLabelWrap must be false")
     if list_pattern.get("queryControlWidth") != "fill":
         fail("pagePatterns.list.queryControlWidth must be fill")
-    if list_pattern.get("queryActionsAlign") != "left-center":
-        fail("pagePatterns.list.queryActionsAlign must be left-center")
+    if list_pattern.get("queryActionsAlign") != "right-center":
+        fail("pagePatterns.list.queryActionsAlign must be right-center")
+    if list_pattern.get("queryResponsiveColumns") != [4, 2, 1]:
+        fail("pagePatterns.list.queryResponsiveColumns must be [4, 2, 1]")
+    if list_pattern.get("queryActionsStayRowEnd") is not True:
+        fail("pagePatterns.list.queryActionsStayRowEnd must be true")
     if list_pattern.get("showTableTitle") is not False:
         fail("pagePatterns.list.showTableTitle must be false")
     if list_pattern.get("tableActionsPosition") != "header-left":
@@ -174,6 +193,12 @@ def validate(data: dict[str, Any]) -> None:
         fail("pagePatterns.formNarrowLayout must be vertical")
     if patterns.get("detailTypes") != ["basic", "advanced"]:
         fail("pagePatterns.detailTypes must contain basic and advanced")
+    if patterns.get("detailEditSurfaceConsistency") != "same-within-list":
+        fail("pagePatterns.detailEditSurfaceConsistency must be same-within-list")
+    if patterns.get("surfaceConflictResolution") != "escalate-to-more-complex":
+        fail("pagePatterns.surfaceConflictResolution must be escalate-to-more-complex")
+    if patterns.get("surfacePriority") != ["modal", "drawer", "page"]:
+        fail("pagePatterns.surfacePriority must be modal, drawer, page")
     detail_columns = patterns.get("detailColumns")
     if not isinstance(detail_columns, int) or detail_columns not in {1, 2, 3}:
         fail("pagePatterns.detailColumns must be 1, 2, or 3")

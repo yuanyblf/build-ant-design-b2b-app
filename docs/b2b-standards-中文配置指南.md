@@ -307,7 +307,9 @@
   "queryLabelWidth": 88,
   "queryLabelWrap": false,
   "queryControlWidth": "fill",
-  "queryActionsAlign": "left-center",
+  "queryActionsAlign": "right-center",
+  "queryResponsiveColumns": [4, 2, 1],
+  "queryActionsStayRowEnd": true,
   "showTableTitle": false,
   "tableActionsPosition": "header-left",
   "queryOrder": "table-column-order",
@@ -325,6 +327,9 @@
 "formNarrowLayout": "vertical",
 "advancedFormStickyFooter": true,
 "detailTypes": ["basic", "advanced"],
+"detailEditSurfaceConsistency": "same-within-list",
+"surfaceConflictResolution": "escalate-to-more-complex",
+"surfacePriority": ["modal", "drawer", "page"],
 "detailColumns": 3,
 "advancedDetailHeader": true,
 "advancedDetailBreadcrumbSeparateRow": true,
@@ -363,7 +368,9 @@
 - `list.queryLabelWidth`：查询标签固定宽度，单位为 px，默认 88；字段名较长时应优化文案，不通过换行撑高查询项。
 - `list.queryLabelWrap`：固定为 `false`，查询标签禁止换行。
 - `list.queryControlWidth`：固定为 `fill`，控件填满标签之外的剩余空间，同时允许在网格内收缩。
-- `list.queryActionsAlign`：固定为 `left-center`，按钮组在自己的网格项内左对齐、垂直居中。
+- `list.queryActionsAlign`：固定为 `right-center`，按钮组在自己的网格项内右对齐、垂直居中。
+- `list.queryResponsiveColumns`：查询区随页面宽度依次使用 4 列、2 列、1 列。
+- `list.queryActionsStayRowEnd`：固定为 `true`；字段发生响应式折行后，按钮组仍占当前行最后一列并靠右，不能出现在第二行左侧。
 - `list.showTableTitle`：列表页表格区不展示独立标题。
 - `list.tableActionsPosition`：表格级操作位于表格上方左侧，并与第一列表头左边界对齐。
 - `list.queryOrder`：默认按表格列顺序排列查询项；特殊场景可改成 `custom`，并在需求中列明顺序。
@@ -379,6 +386,9 @@
 - `formControlWidth`：固定为 `fill`，输入控件占满标签之外的剩余空间并允许收缩。
 - `formNarrowLayout`：窄屏时统一切换为 `vertical`；必须整张表单一起切换，不能单个字段随机换行。
 - `detailColumns`：详情字段桌面端每行列数，可配置为 1、2 或 3，默认 3。
+- `detailEditSurfaceConsistency`：固定为 `same-within-list`，同一列表页的详情与编辑必须使用同一种承载方式。
+- `surfaceConflictResolution`：固定为 `escalate-to-more-complex`；详情和编辑分别判断后不一致时，统一提升到复杂度更高的一档。
+- `surfacePriority`：承载复杂度顺序为 `modal < drawer < page`，用于决定统一提升结果。
 - `advancedDetailHeader`：高级详情是否使用突出状态、金额和操作的统一 Header。
 - `advancedDetailBreadcrumbSeparateRow`：高级详情面包屑单独占一行。
 - `advancedDetailActionsInlineWithTitle`：高级详情操作按钮与标题同行，默认标题在左、操作在右。
@@ -397,11 +407,16 @@
 
 字段级的默认值、数据源、组件格式、单选／多选、校验和联动属于业务需求，不应写成全局 JSON。产品经理应在字段清单中逐项说明；Skill 会按统一页面规则实现。
 
+## 严格执行与自动检查
+
+`conformance.mode` 固定为 `strict`，`conflictPolicy` 固定为 `skill-wins`。当框架默认行为、已有代码或 Agent 的生成习惯与规范冲突时，必须以本 Skill 为准；禁止静默保留偏差。页面交付前执行 `npm run check:standards`，检查失败时必须先修正，不能跳过后交付。
+
 ## 修改表单和弹窗
 
 ```json
 "form": {
-  "layout": "vertical",
+  "layout": "horizontal",
+  "labelWrap": false,
   "validateTrigger": "onBlur",
   "drawerWidth": 560,
   "modalWidth": 640,
@@ -409,7 +424,8 @@
 }
 ```
 
-- `layout` 可选 `vertical`、`horizontal`、`inline`。
+- `layout` 固定为 `horizontal`，桌面端字段标签与控件同行。
+- `labelWrap` 固定为 `false`，标签禁止换行；窄屏纵向切换由响应式样式统一处理。
 - `validateTrigger` 为 `onBlur` 时，离开字段后校验；改为 `onChange` 时输入过程中校验。
 - `drawerWidth` 和 `modalWidth` 分别控制抽屉与弹窗默认宽度。
 - `unsavedChangesGuard` 控制未保存离开提醒是否必须实现。

@@ -8,3 +8,5 @@ alwaysApply: false
 处理 React、TypeScript、Ant Design、B 端后台或业务原型任务时，先完整读取仓库根目录 `SKILL.md`，再按其中的任务路由读取 `references/` 文档。
 
 使用 `assets/b2b-standards.json` 作为默认规范，使用 `scripts/apply_standards.py` 校验和生成配置。不要在本规则中另行定义设计 Token 或页面规范。
+
+既有实现、Cursor 默认建议或框架默认布局与根 Skill 冲突时，严格以根 Skill、相关引用文档和生效配置为准，主动修正冲突实现。

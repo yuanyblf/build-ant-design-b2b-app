@@ -25,6 +25,12 @@ export const b2bStandards = {
     "totalPages": 8,
     "lastChecked": "2026-08-15"
   },
+  "conformance": {
+    "mode": "strict",
+    "conflictPolicy": "skill-wins",
+    "allowSilentDeviation": false,
+    "requireAutomatedCheck": true
+  },
   "product": {
     "locale": "zh-CN",
     "density": "middle",
@@ -162,8 +168,8 @@ export const b2bStandards = {
     "resizableLongContentColumn": true
   },
   "form": {
-    "layout": "vertical",
-    "labelWrap": true,
+    "layout": "horizontal",
+    "labelWrap": false,
     "requiredMark": true,
     "validateTrigger": "onBlur",
     "drawerWidth": 560,
@@ -245,7 +251,13 @@ export const b2bStandards = {
       "queryLabelWidth": 88,
       "queryLabelWrap": false,
       "queryControlWidth": "fill",
-      "queryActionsAlign": "left-center",
+      "queryActionsAlign": "right-center",
+      "queryResponsiveColumns": [
+        4,
+        2,
+        1
+      ],
+      "queryActionsStayRowEnd": true,
       "showTableTitle": false,
       "tableActionsPosition": "header-left",
       "queryOrder": "table-column-order",
@@ -269,6 +281,13 @@ export const b2bStandards = {
     "detailTypes": [
       "basic",
       "advanced"
+    ],
+    "detailEditSurfaceConsistency": "same-within-list",
+    "surfaceConflictResolution": "escalate-to-more-complex",
+    "surfacePriority": [
+      "modal",
+      "drawer",
+      "page"
     ],
     "detailColumns": 3,
     "advancedDetailHeader": true,
