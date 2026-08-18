@@ -18,9 +18,10 @@ import { b2bStandards } from '../shared/design-system/generated/b2b-standards.ge
 const { Header, Sider, Content } = Layout;
 
 export function App() {
-  const [application, setApplication] = useState('workbench');
+  const hasSharedDepartmentFilter = new URLSearchParams(window.location.search).has('department');
+  const [application, setApplication] = useState(hasSharedDepartmentFilter ? 'organization' : 'workbench');
   const [applicationCardOpen, setApplicationCardOpen] = useState(false);
-  const [page, setPage] = useState('dashboard');
+  const [page, setPage] = useState(hasSharedDepartmentFilter ? 'employees' : 'dashboard');
   const [detailOrder, setDetailOrder] = useState<Order>();
   const layoutStyle = {
     '--header-height': `${b2bStandards.theme.components.Layout.headerHeight}px`,
