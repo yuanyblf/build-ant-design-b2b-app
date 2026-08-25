@@ -1,5 +1,5 @@
 import { Children, useState, type CSSProperties, type ReactNode } from 'react';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Card, Flex, Space, Typography } from 'antd';
 
 export function ListPageHeading({ paths, title, subtitle }: { paths: string[]; title: string; subtitle: string }) {
@@ -23,5 +23,5 @@ export function SearchPanel({ children, onSearch, onReset }: { children: ReactNo
     '--search-action-row-2': Math.floor(visibleFields.length / 2) + 1,
     '--search-action-row-1': visibleFields.length + 1,
   } as CSSProperties;
-  return <Card className="search-card"><div className="search-fields" style={actionRows}>{visibleFields}<div className="search-actions"><Space wrap={false}><Button type="primary" onClick={onSearch}>查询</Button><Button onClick={onReset}>重置</Button>{collapsible && <Button type="link" icon={expanded ? <UpOutlined /> : <DownOutlined />} onClick={() => setExpanded(value => !value)}>{expanded ? '收起' : '展开'}</Button>}</Space></div></div></Card>;
+  return <Card className="search-card"><div className="search-fields" style={actionRows}>{visibleFields}<div className="search-actions"><Space wrap={false}><Button type="primary" icon={<SearchOutlined />} onClick={onSearch}>查询</Button><Button icon={<ReloadOutlined />} onClick={onReset}>重置</Button>{collapsible && <Button aria-expanded={expanded} icon={expanded ? <UpOutlined /> : <DownOutlined />} onClick={() => setExpanded(value => !value)}>{expanded ? '收起' : '展开'}</Button>}</Space></div></div></Card>;
 }

@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>用户管理 - 企业管理平台</title>
+  <style>
+    :root {
+      --color-primary: #2a56de;
+      --color-primary-hover: #5278e5;
+      --color-primary-active: #1f45c2;
+      --color-secondary: #ff6b06;
+      --color-success: #52c41a;
+      --color-warning: #faad14;
+      --color-error: #ff4d4f;
+      --color-text: #171a1d;
+      --color-text-secondary: #747677;
+      --color-border: #e8e9eb;
+      --color-bg-layout: #f5f5f5;
+      --color-bg-container: #fff;
+      --control-height: 32px;
+      --radius: 6px;
+      --page-gap: 24px;
+      --header-height: 50px;
+      --sider-width: 224px;
+      --shadow-popup: 0 6px 16px rgb(0 0 0 / 8%);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--color-text);
+      background: var(--color-bg-layout);
+      font: 14px/1.5715 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button, a, input, select { outline: none; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid rgb(42 86 222 / 35%);
+      outline-offset: 2px;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      color: var(--color-text);
+      background: #fff;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .logo {
+      width: var(--sider-width);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .logo-mark {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 5px;
+      color: #fff;
+      background: var(--color-primary);
+      font-size: 13px;
+    }
+    .top-apps { display: flex; align-items: stretch; height: 100%; }
+    .top-app {
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+    }
+    .top-app:hover { color: var(--color-primary); }
+    .top-app.active { color: var(--color-primary); border-bottom-color: var(--color-primary); background: rgb(42 86 222 / 5%); }
+    .header-user {
+      margin-left: auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: #5cdbd3;
+      font-size: 12px;
+    }
+
+    .app-body { min-height: calc(100vh - var(--header-height)); display: flex; }
+    .sider {
+      position: sticky;
+      top: var(--header-height);
+      width: var(--sider-width);
+      height: calc(100vh - var(--header-height));
+      flex: 0 0 var(--sider-width);
+      padding-top: 8px;
+      overflow-y: auto;
+      color: var(--color-text-secondary);
+      background: #fff;
+      border-right: 1px solid var(--color-border);
+    }
+    .menu-item {
+      height: 40px;
+      margin: 4px 8px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: inherit;
+      border-radius: var(--radius);
+      text-decoration: none;
+    }
+    .menu-item:hover { color: var(--color-primary); background: rgb(42 86 222 / 5%); }
+    .menu-item.active { color: var(--color-primary); background: rgb(42 86 222 / 10%); }
+    .menu-icon { width: 16px; text-align: center; }
+
+    .content {
+      min-width: 0;
+      flex: 1;
+      padding: 16px var(--page-gap) var(--page-gap);
+    }
+    .content-inner { width: 100%; min-width: 0; }
+    .breadcrumb { margin-bottom: 12px; color: var(--color-text-secondary); font-size: 13px; }
+    .breadcrumb span:last-child { color: var(--color-text); }
+    .page-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .page-heading h1 { margin: 0; font-size: 20px; line-height: 32px; font-weight: 600; }
+    .page-heading p { margin: 0; color: var(--color-text-secondary); }
+
+    .panel { background: var(--color-bg-container); border: 1px solid var(--color-border); border-radius: var(--radius); }
+    .search-panel { padding: 16px; margin-bottom: 16px; }
+    .search-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: center; }
+    .search-item { min-width: 0; display: flex; align-items: center; }
+    .search-label { width: 88px; flex: 0 0 88px; white-space: nowrap; color: var(--color-text); }
+    .search-actions { grid-column: 4; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .search-item.is-extra[hidden] { display: none; }
+
+    .input, .select {
+      width: 100%;
+      min-width: 0;
+      height: var(--control-height);
+      padding: 4px 11px;
+      color: var(--color-text);
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      border-radius: var(--radius);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .select {
+      padding-right: 40px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%23747677' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 18px center;
+    }
+    .input:hover, .select:hover { border-color: var(--color-primary-hover); }
+    .input:focus, .select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgb(42 86 222 / 10%); }
+    .field-short { width: min(180px, 100%); }
+    .field-medium { width: min(280px, 100%); }
+    .field-long { width: min(400px, 100%); }
+    .input[aria-invalid="true"] { border-color: var(--color-error); }
+
+    .btn {
+      min-height: var(--control-height);
+      padding: 4px 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--color-text);
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      border-radius: var(--radius);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .btn-icon { width: 14px; height: 14px; flex: 0 0 14px; }
+    .btn:hover { color: var(--color-primary); border-color: var(--color-primary); }
+    .btn:active { color: var(--color-primary-active); border-color: var(--color-primary-active); }
+    .btn-primary { color: #fff; background: var(--color-primary); border-color: var(--color-primary); }
+    .btn-primary:hover { color: #fff; background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+    .btn-danger { color: var(--color-error); border-color: #ffccc7; }
+    .btn-danger:hover { color: #fff; background: var(--color-error); border-color: var(--color-error); }
+    .btn-danger-primary { color: #fff; background: var(--color-error); border-color: var(--color-error); }
+    .btn-link { min-height: auto; padding: 0; color: var(--color-primary); background: transparent; border: 0; }
+    .btn-link:hover { color: var(--color-primary-hover); }
+    .btn-link.danger { color: var(--color-error); }
+    .btn[disabled] { color: rgb(0 0 0 / 25%); background: rgb(0 0 0 / 4%); border-color: #d9d9d9; cursor: not-allowed; }
+
+    .table-panel { overflow: hidden; }
+    .toolbar { min-height: 64px; padding: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
+    .toolbar-actions { margin-left: auto; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+    .selection-bar {
+      margin: 0 16px 16px;
+      padding: 8px 12px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      color: var(--color-primary-active);
+      background: rgb(42 86 222 / 6%);
+      border: 1px solid rgb(42 86 222 / 28%);
+      border-radius: var(--radius);
+    }
+    .selection-bar.visible { display: flex; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; min-width: 974px; border-collapse: collapse; table-layout: fixed; }
+    th, td { padding: 12px 16px; text-align: left; border-top: 1px solid var(--color-border); vertical-align: middle; }
+    th { color: rgb(0 0 0 / 88%); background: #fafafa; font-weight: 600; white-space: nowrap; }
+    tbody tr:hover { background: #fafafa; }
+    .check-cell { width: 48px; text-align: center; }
+    .check-cell input { width: 16px; height: 16px; accent-color: var(--color-primary); }
+    .user-link { color: var(--color-primary); background: none; border: 0; padding: 0; cursor: pointer; }
+    .user-link:hover { color: var(--color-primary-hover); }
+    .created-at { white-space: nowrap; }
+    .ellipsis-text { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ellipsis-text[tabindex="0"] { cursor: help; }
+    .overflow-tooltip {
+      position: fixed;
+      z-index: 300;
+      max-width: 300px;
+      display: none;
+      padding: 6px 8px;
+      color: #fff;
+      background: rgb(0 0 0 / 85%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-popup);
+      overflow-wrap: anywhere;
+      pointer-events: none;
+    }
+    .overflow-tooltip.visible { display: block; }
+    .tag { display: inline-flex; align-items: center; padding: 0 7px; line-height: 22px; border: 1px solid; border-radius: 4px; white-space: nowrap; }
+    .tag.active { color: #389e0d; background: #f6ffed; border-color: #b7eb8f; }
+    .tag.disabled { color: var(--color-text-secondary); background: #fafafa; border-color: #d9d9d9; }
+    .operation-cell { position: sticky; right: 0; min-width: 160px; text-align: right; white-space: nowrap; box-shadow: -8px 0 8px -8px rgb(0 0 0 / 12%); }
+    thead .operation-cell { background: #fafafa; }
+    tbody .operation-cell { background: #fff; }
+    tbody tr:hover .operation-cell { background: #fafafa; }
+    .operation-cell button + button { margin-left: 12px; }
+    .empty-state { display: none; padding: 56px 24px; text-align: center; color: var(--color-text-secondary); border-top: 1px solid var(--color-border); }
+    .empty-state.visible { display: block; }
+    .empty-icon { margin-bottom: 8px; font-size: 32px; color: #bfbfbf; }
+    .pagination { min-height: 64px; padding: 16px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; border-top: 1px solid var(--color-border); }
+    .page-info { margin-right: 8px; color: var(--color-text-secondary); }
+    .page-btn { min-width: 32px; padding: 4px 8px; }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgb(0 0 0 / 45%);
+    }
+    .modal-mask.open { display: flex; }
+    .modal {
+      width: min(640px, 100%);
+      max-height: calc(100vh - 48px);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-popup);
+    }
+    .modal.small { width: min(480px, 100%); }
+    .modal-header { min-height: 56px; padding: 16px 24px; display: flex; align-items: center; border-bottom: 1px solid var(--color-border); }
+    .modal-title { margin: 0; font-size: 16px; font-weight: 600; }
+    .modal-close { margin-left: auto; width: 32px; height: 32px; padding: 0; color: var(--color-text-secondary); background: transparent; border: 0; cursor: pointer; font-size: 20px; }
+    .modal-body { padding: 24px; overflow-y: auto; }
+    .modal-footer { padding: 12px 24px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--color-border); }
+    .form-item { display: flex; align-items: flex-start; margin-bottom: 20px; }
+    .form-item:last-child { margin-bottom: 0; }
+    .form-label { width: 112px; flex: 0 0 112px; padding-top: 5px; text-align: right; white-space: nowrap; }
+    .form-label.required::before { content: "*"; margin-right: 4px; color: var(--color-error); }
+    .form-control { min-width: 0; flex: 1; padding-left: 12px; }
+    .form-help { margin-top: 4px; color: var(--color-text-secondary); font-size: 12px; }
+    .form-error { min-height: 20px; margin-top: 2px; color: var(--color-error); font-size: 12px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
+    .detail-label { margin-bottom: 4px; color: var(--color-text-secondary); }
+    .confirm-row { display: flex; gap: 16px; }
+    .confirm-icon { color: var(--color-warning); font-size: 22px; }
+    .confirm-text { margin: 0 0 8px; font-weight: 600; }
+    .confirm-desc { margin: 0; color: var(--color-text-secondary); }
+
+    .toast-container { position: fixed; top: 66px; left: 50%; z-index: 200; transform: translateX(-50%); }
+    .toast { margin-bottom: 8px; padding: 9px 16px; display: flex; align-items: center; gap: 8px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-popup); animation: toast-in .2s ease-out; }
+    .toast.success::before { content: "✓"; color: var(--color-success); }
+    .toast.error::before { content: "!"; color: var(--color-error); }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(-8px); } }
+
+    @media (max-width: 1100px) {
+      .search-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .search-actions { grid-column: 2; }
+    }
+    @media (max-width: 767px) {
+      :root { --page-gap: 16px; }
+      .logo { width: auto; padding: 0 16px; }
+      .logo span:last-child, .top-apps, .header-user span:last-child { display: none; }
+      .header-user { padding: 0 16px; }
+      .sider { display: none; }
+      .content { padding-top: 12px; }
+      .search-grid { grid-template-columns: minmax(0, 1fr); }
+      .search-actions { grid-column: 1; justify-content: flex-end; }
+      .search-item { align-items: flex-start; flex-direction: column; gap: 4px; }
+      .search-label { width: auto; flex-basis: auto; }
+      .toolbar { align-items: flex-start; }
+      .toolbar-actions { width: 100%; margin-left: 0; }
+      .pagination { justify-content: flex-start; flex-wrap: wrap; }
+      .form-item { flex-direction: column; }
+      .form-label { width: auto; flex-basis: auto; padding-top: 0; margin-bottom: 4px; text-align: left; }
+      .form-control { width: 100%; padding-left: 0; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .modal-mask { padding: 12px; align-items: flex-start; }
+      .modal { margin-top: 24px; max-height: calc(100vh - 48px); }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo"><span class="logo-mark">企</span><span>企业管理平台</span></div>
+    <nav class="top-apps" aria-label="应用切换">
+      <a class="top-app active" href="#">组织管理</a>
+      <a class="top-app" href="#" onclick="showToast('该演示仅开放组织管理应用'); return false;">业务中心</a>
+      <a class="top-app" href="#" onclick="showToast('该演示仅开放组织管理应用'); return false;">数据中心</a>
+    </nav>
+    <div class="header-user"><span class="avatar">管</span><span>系统管理员</span></div>
+  </header>
+
+  <div class="app-body">
+    <aside class="sider" aria-label="主导航">
+      <a class="menu-item" href="#" onclick="showToast('仪表盘为演示菜单'); return false;"><span class="menu-icon">⌂</span>仪表盘</a>
+      <a class="menu-item active" href="#"><span class="menu-icon">♙</span>用户管理</a>
+      <a class="menu-item" href="#" onclick="showToast('角色管理为演示菜单'); return false;"><span class="menu-icon">♜</span>角色管理</a>
+      <a class="menu-item" href="#" onclick="showToast('部门管理为演示菜单'); return false;"><span class="menu-icon">◇</span>部门管理</a>
+      <a class="menu-item" href="#" onclick="showToast('权限配置为演示菜单'); return false;"><span class="menu-icon">⚿</span>权限配置</a>
+    </aside>
+
+    <main class="content">
+      <div class="content-inner">
+        <div class="breadcrumb" aria-label="面包屑"><span>组织管理</span> &gt; <span>用户管理</span></div>
+        <div class="page-heading">
+          <h1>用户管理</h1>
+          <p>维护企业成员信息、角色和账号状态</p>
+        </div>
+
+        <section class="panel search-panel" aria-label="用户查询">
+          <form id="searchForm" class="search-grid">
+            <div class="search-item">
+              <label class="search-label" for="searchName">用户姓名</label>
+              <input class="input" id="searchName" name="name" placeholder="请输入用户姓名" autocomplete="off" />
+            </div>
+            <div class="search-item">
+              <label class="search-label" for="searchPhone">手机号码</label>
+              <input class="input" id="searchPhone" name="phone" placeholder="请输入手机号码" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div class="search-item">
+              <label class="search-label" for="searchDepartment">所属部门</label>
+              <select class="select" id="searchDepartment" name="department">
+                <option value="">全部部门</option>
+                <option>产品部</option><option>研发部</option><option>市场部</option><option>人力资源部</option><option>财务部</option>
+              </select>
+            </div>
+            <div class="search-item is-extra" hidden>
+              <label class="search-label" for="searchRole">用户角色</label>
+              <select class="select" id="searchRole" name="role">
+                <option value="">全部角色</option>
+                <option>系统管理员</option><option>部门管理员</option><option>普通成员</option><option>访客</option>
+              </select>
+            </div>
+            <div class="search-item is-extra" hidden>
+              <label class="search-label" for="searchStatus">账号状态</label>
+              <select class="select" id="searchStatus" name="status">
+                <option value="">全部状态</option><option value="active">正常</option><option value="disabled">已停用</option>
+              </select>
+            </div>
+            <div class="search-actions">
+              <button class="btn btn-primary" type="submit"><svg class="btn-icon" aria-hidden="true" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m10.5 10.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>查询</button>
+              <button class="btn" type="button" id="resetBtn"><svg class="btn-icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M13 7a5 5 0 1 0-1.3 3.35" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13 3v4H9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>重置</button>
+              <button class="btn" type="button" id="expandBtn" aria-expanded="false">展开⌄</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel table-panel" aria-label="用户列表">
+          <div class="toolbar">
+            <span id="resultSummary" class="page-info" aria-live="polite"></span>
+            <div class="toolbar-actions">
+              <button class="btn btn-danger" type="button" id="batchDeleteBtn" disabled>批量删除</button>
+              <button class="btn" type="button" id="exportBtn">导出</button>
+              <button class="btn btn-primary" type="button" id="addBtn">＋ 新增用户</button>
+            </div>
+          </div>
+          <div id="selectionBar" class="selection-bar" role="status">
+            <span>已选择 <strong id="selectedCount">0</strong> 项</span>
+            <button class="btn btn-link" type="button" id="clearSelectionBtn">清除选择</button>
+          </div>
+          <div class="table-scroll">
+            <table id="userTable">
+              <colgroup>
+                <col style="width:44px"><col style="width:100px"><col style="width:105px"><col style="width:150px"><col style="width:110px">
+                <col style="width:110px"><col style="width:80px"><col style="width:130px"><col style="width:145px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="check-cell"><input id="selectAll" type="checkbox" aria-label="选择当前页全部用户" /></th>
+                  <th>用户姓名</th><th>手机号码</th><th>电子邮箱</th><th>所属部门</th><th>用户角色</th><th>账号状态</th><th>创建时间</th><th class="operation-cell">操作</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="empty-state">
+            <div class="empty-icon">□</div>
+            <div id="emptyText">暂无用户数据</div>
+          </div>
+          <div class="pagination">
+            <span id="pageInfo" class="page-info"></span>
+            <button class="btn page-btn" type="button" id="prevPage" aria-label="上一页">‹</button>
+            <span id="pageNumber" aria-current="page">1</span>
+            <button class="btn page-btn" type="button" id="nextPage" aria-label="下一页">›</button>
+            <select id="pageSize" class="select" aria-label="每页条数" style="width: 100px">
+              <option value="20">20 条/页</option><option value="10">10 条/页</option><option value="50">50 条/页</option>
+            </select>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="editorMask" class="modal-mask" aria-hidden="true">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+      <header class="modal-header">
+        <h2 id="editorTitle" class="modal-title">新增用户</h2>
+        <button class="modal-close" type="button" data-close="editor" aria-label="关闭弹窗">×</button>
+      </header>
+      <form id="userForm" novalidate>
+        <div class="modal-body">
+          <div class="form-item">
+            <label class="form-label required" for="userName">用户姓名</label>
+            <div class="form-control"><input class="input field-medium" id="userName" name="name" maxlength="20" /><div class="form-help">2～20 个字符，用于企业内部识别</div><div class="form-error" data-error-for="name"></div></div>
+          </div>
+          <div class="form-item">
+            <label class="form-label required" for="userPhone">手机号码</label>
+            <div class="form-control"><input class="input field-medium" id="userPhone" name="phone" maxlength="11" inputmode="numeric" /><div class="form-help">请输入中国大陆 11 位手机号码，且不可重复</div><div class="form-error" data-error-for="phone"></div></div>
+          </div>
+          <div class="form-item">
+            <label class="form-label required" for="userEmail">电子邮箱</label>
+            <div class="form-control"><input class="input field-long" id="userEmail" name="email" type="email" /><div class="form-help">用于接收账号通知，且不可重复</div><div class="form-error" data-error-for="email"></div></div>
+          </div>
+          <div class="form-item">
+            <label class="form-label required" for="userDepartment">所属部门</label>
+            <div class="form-control"><select class="select field-medium" id="userDepartment" name="department"><option value="">请选择部门</option><option>产品部</option><option>研发部</option><option>市场部</option><option>人力资源部</option><option>财务部</option></select><div class="form-help">部门数据来自企业组织架构</div><div class="form-error" data-error-for="department"></div></div>
+          </div>
+          <div class="form-item">
+            <label class="form-label required" for="userRole">用户角色</label>
+            <div class="form-control"><select class="select field-medium" id="userRole" name="role"><option value="">请选择角色</option><option>系统管理员</option><option>部门管理员</option><option>普通成员</option><option>访客</option></select><div class="form-help">角色决定用户可访问的功能范围</div><div class="form-error" data-error-for="role"></div></div>
+          </div>
+          <div class="form-item">
+            <label class="form-label required" for="userStatus">账号状态</label>
+            <div class="form-control"><select class="select field-short" id="userStatus" name="status"><option value="active">正常</option><option value="disabled">已停用</option></select><div class="form-help">停用后用户将无法登录，但历史数据会保留</div><div class="form-error" data-error-for="status"></div></div>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button class="btn" type="button" data-close="editor">取消</button>
+          <button class="btn btn-primary" type="submit" id="saveBtn">确认</button>
+        </footer>
+      </form>
+    </section>
+  </div>
+
+  <div id="detailMask" class="modal-mask" aria-hidden="true">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <header class="modal-header">
+        <h2 id="detailTitle" class="modal-title">用户详情</h2>
+        <button class="modal-close" type="button" data-close="detail" aria-label="关闭弹窗">×</button>
+      </header>
+      <div class="modal-body"><div id="detailGrid" class="detail-grid"></div></div>
+      <footer class="modal-footer"><button class="btn" type="button" data-close="detail">关闭</button><button class="btn btn-primary" type="button" id="detailEditBtn">编辑</button></footer>
+    </section>
+  </div>
+
+  <div id="confirmMask" class="modal-mask" aria-hidden="true">
+    <section class="modal small" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmDesc">
+      <header class="modal-header"><h2 id="confirmTitle" class="modal-title">确认删除</h2><button class="modal-close" type="button" data-close="confirm" aria-label="关闭确认弹窗">×</button></header>
+      <div class="modal-body"><div class="confirm-row"><span class="confirm-icon">⚠</span><div><p id="confirmText" class="confirm-text"></p><p id="confirmDesc" class="confirm-desc">删除后无法恢复，相关账号将立即无法登录。</p></div></div></div>
+      <footer class="modal-footer"><button class="btn" type="button" data-close="confirm">取消</button><button class="btn btn-danger-primary" type="button" id="confirmDeleteBtn">确认删除</button></footer>
+    </section>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <div id="overflowTooltip" class="overflow-tooltip" role="tooltip"></div>
+
+  <script>
+    (() => {
+      const initialUsers = [
+        ['U10001','张伟','13800138001','zhangwei@example.com','产品部','部门管理员','active','2026-08-18 09:32'],
+        ['U10002','王芳','13800138002','wangfang@example.com','研发部','普通成员','active','2026-08-17 14:20'],
+        ['U10003','李娜','13800138003','lina@example.com','市场部','普通成员','active','2026-08-16 11:08'],
+        ['U10004','刘强','13800138004','liuqiang@example.com','研发部','系统管理员','active','2026-08-15 16:45'],
+        ['U10005','陈晨','13800138005','chenchen@example.com','人力资源部','部门管理员','active','2026-08-14 10:16'],
+        ['U10006','杨帆','13800138006','yangfan@example.com','财务部','普通成员','disabled','2026-08-13 17:30'],
+        ['U10007','赵敏','13800138007','zhaomin@example.com','产品部','普通成员','active','2026-08-12 13:56'],
+        ['U10008','黄磊','13800138008','huanglei@example.com','研发部','普通成员','active','2026-08-11 08:42'],
+        ['U10009','周婷','13800138009','zhouting@example.com','市场部','部门管理员','active','2026-08-10 15:26'],
+        ['U10010','吴昊','13800138010','wuhao@example.com','财务部','访客','disabled','2026-08-09 12:18'],
+        ['U10011','徐静','13800138011','xujing@example.com','人力资源部','普通成员','active','2026-08-08 09:44'],
+        ['U10012','孙杰','13800138012','sunjie@example.com','产品部','普通成员','active','2026-08-07 18:06'],
+        ['U10013','马超','13800138013','machao@example.com','研发部','普通成员','active','2026-08-06 10:38'],
+        ['U10014','朱琳','13800138014','zhulin@example.com','市场部','访客','active','2026-08-05 14:12'],
+        ['U10015','胡凯','13800138015','hukai@example.com','产品部','普通成员','disabled','2026-08-04 11:52'],
+        ['U10016','郭欣','13800138016','guoxin@example.com','财务部','普通成员','active','2026-08-03 16:28'],
+        ['U10017','何平','13800138017','heping@example.com','研发部','部门管理员','active','2026-08-02 09:10'],
+        ['U10018','高洁','13800138018','gaojie@example.com','人力资源部','普通成员','active','2026-08-01 13:36'],
+        ['U10019','林涛','13800138019','lintao@example.com','市场部','普通成员','active','2026-07-31 15:48'],
+        ['U10020','罗敏','13800138020','luomin@example.com','产品部','访客','active','2026-07-30 10:22'],
+        ['U10021','郑宇','13800138021','zhengyu@example.com','研发部','普通成员','active','2026-07-29 17:05'],
+        ['U10022','梁雪','13800138022','liangxue@example.com','财务部','部门管理员','active','2026-07-28 08:58'],
+        ['U10023','谢峰','13800138023','xiefeng@example.com','市场部','普通成员','disabled','2026-07-27 12:40']
+      ].map(([id,name,phone,email,department,role,status,createdAt]) => ({id,name,phone,email,department,role,status,createdAt}));
+
+      const storageKey = 'b2b-user-list-demo-v1';
+      let users = loadUsers();
+      let filteredUsers = [...users];
+      let selectedIds = new Set();
+      let currentPage = 1;
+      let pageSize = 20;
+      let editingId = null;
+      let detailId = null;
+      let deleteTargets = [];
+      let lastFocused = null;
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+
+      function loadUsers() {
+        try { return JSON.parse(localStorage.getItem(storageKey)) || initialUsers; }
+        catch { return initialUsers; }
+      }
+      function persistUsers() { localStorage.setItem(storageKey, JSON.stringify(users)); }
+      function nowText() {
+        const date = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+      }
+      function statusText(status) { return status === 'active' ? '正常' : '已停用'; }
+
+      function updateOverflowTooltips() {
+        $$('.ellipsis-text').forEach(node => {
+          const overflowed = node.scrollWidth > node.clientWidth + 1;
+          node.dataset.overflow = String(overflowed);
+          if (overflowed) {
+            node.tabIndex = 0;
+            node.setAttribute('aria-describedby', 'overflowTooltip');
+          } else {
+            node.removeAttribute('tabindex');
+            node.removeAttribute('aria-describedby');
+          }
+        });
+      }
+
+      function showOverflowTooltip(target) {
+        if (target.dataset.overflow !== 'true') return;
+        const tooltip = $('#overflowTooltip');
+        tooltip.textContent = target.dataset.fullText || target.textContent.trim();
+        tooltip.classList.add('visible');
+        const rect = target.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const left = Math.min(Math.max(8, rect.left), window.innerWidth - tooltipRect.width - 8);
+        const top = rect.top - tooltipRect.height - 8 >= 8 ? rect.top - tooltipRect.height - 8 : rect.bottom + 8;
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+      }
+
+      function hideOverflowTooltip() { $('#overflowTooltip').classList.remove('visible'); }
+
+      function render() {
+        const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
+        currentPage = Math.min(currentPage, totalPages);
+        const pageRows = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+        $('#tableBody').innerHTML = pageRows.map(user => `
+          <tr>
+            <td class="check-cell"><input class="row-check" type="checkbox" value="${user.id}" aria-label="选择用户 ${escapeHtml(user.name)}" ${selectedIds.has(user.id) ? 'checked' : ''}></td>
+            <td><button class="user-link view-btn ellipsis-text" type="button" data-id="${user.id}" data-full-text="${escapeHtml(user.name)}">${escapeHtml(user.name)}</button></td>
+            <td><span class="ellipsis-text" data-full-text="${escapeHtml(user.phone)}">${escapeHtml(user.phone)}</span></td>
+            <td><span class="ellipsis-text" data-full-text="${escapeHtml(user.email)}">${escapeHtml(user.email)}</span></td>
+            <td><span class="ellipsis-text" data-full-text="${escapeHtml(user.department)}">${escapeHtml(user.department)}</span></td>
+            <td><span class="ellipsis-text" data-full-text="${escapeHtml(user.role)}">${escapeHtml(user.role)}</span></td>
+            <td><span class="tag ${user.status}">${statusText(user.status)}</span></td><td><span class="created-at ellipsis-text" data-full-text="${escapeHtml(user.createdAt)}">${escapeHtml(user.createdAt)}</span></td>
+            <td class="operation-cell"><button class="btn btn-link view-btn" type="button" data-id="${user.id}" aria-label="查看用户 ${escapeHtml(user.name)}">详情</button><button class="btn btn-link edit-btn" type="button" data-id="${user.id}" aria-label="编辑用户 ${escapeHtml(user.name)}">编辑</button><button class="btn btn-link danger delete-btn" type="button" data-id="${user.id}" aria-label="删除用户 ${escapeHtml(user.name)}">删除</button></td>
+          </tr>`).join('');
+
+        const hasRows = pageRows.length > 0;
+        $('#userTable').style.display = hasRows ? 'table' : 'none';
+        $('#emptyState').classList.toggle('visible', !hasRows);
+        $('#emptyText').textContent = users.length === 0 ? '暂无用户数据，请新增用户' : '没有符合当前筛选条件的用户';
+        $('#resultSummary').textContent = `共 ${filteredUsers.length} 条`;
+        $('#pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页`;
+        $('#pageNumber').textContent = currentPage;
+        $('#prevPage').disabled = currentPage <= 1;
+        $('#nextPage').disabled = currentPage >= totalPages;
+        const selectedOnPage = pageRows.filter(u => selectedIds.has(u.id)).length;
+        $('#selectAll').checked = hasRows && selectedOnPage === pageRows.length;
+        $('#selectAll').indeterminate = selectedOnPage > 0 && selectedOnPage < pageRows.length;
+        $('#selectedCount').textContent = selectedIds.size;
+        $('#selectionBar').classList.toggle('visible', selectedIds.size > 0);
+        $('#batchDeleteBtn').disabled = selectedIds.size === 0;
+        bindRowEvents();
+        requestAnimationFrame(updateOverflowTooltips);
+      }
+
+      function applyFilters(syncUrl = true) {
+        const values = Object.fromEntries(new FormData($('#searchForm')));
+        filteredUsers = users.filter(user =>
+          (!values.name || user.name.includes(values.name.trim())) &&
+          (!values.phone || user.phone.includes(values.phone.trim())) &&
+          (!values.department || user.department === values.department) &&
+          (!values.role || user.role === values.role) &&
+          (!values.status || user.status === values.status)
+        );
+        currentPage = 1;
+        selectedIds.clear();
+        if (syncUrl) {
+          const params = new URLSearchParams();
+          Object.entries(values).forEach(([key, value]) => value && params.set(key, value));
+          history.replaceState(null, '', `${location.pathname}${params.size ? '?' + params : ''}${location.hash}`);
+        }
+        render();
+      }
+
+      function bindRowEvents() {
+        $$('.row-check').forEach(input => input.addEventListener('change', event => {
+          event.target.checked ? selectedIds.add(event.target.value) : selectedIds.delete(event.target.value);
+          render();
+        }));
+        $$('.view-btn').forEach(button => button.addEventListener('click', () => openDetail(button.dataset.id, button)));
+        $$('.edit-btn').forEach(button => button.addEventListener('click', () => openEditor(button.dataset.id, button)));
+        $$('.delete-btn').forEach(button => button.addEventListener('click', () => openDeleteConfirm([button.dataset.id], button)));
+      }
+
+      function openModal(mask, trigger) {
+        lastFocused = trigger || document.activeElement;
+        mask.classList.add('open');
+        mask.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => mask.querySelector('button, input, select')?.focus(), 0);
+      }
+      function closeModal(name, restoreFocus = true) {
+        const mask = $(`#${name}Mask`);
+        mask.classList.remove('open');
+        mask.setAttribute('aria-hidden', 'true');
+        if (!$$('.modal-mask.open').length) document.body.style.overflow = '';
+        if (restoreFocus) setTimeout(() => lastFocused?.focus(), 0);
+      }
+
+      function openEditor(id = null, trigger) {
+        editingId = id;
+        clearFormErrors();
+        const user = users.find(item => item.id === id);
+        $('#editorTitle').textContent = user ? '编辑用户' : '新增用户';
+        $('#saveBtn').textContent = user ? '确认修改' : '确认新增';
+        $('#userForm').reset();
+        const defaults = user || {name:'', phone:'', email:'', department:'', role:'普通成员', status:'active'};
+        Object.entries(defaults).forEach(([key, value]) => { if ($('#userForm').elements[key]) $('#userForm').elements[key].value = value; });
+        openModal($('#editorMask'), trigger);
+      }
+
+      function validateForm(values) {
+        const errors = {};
+        if (!values.name || values.name.trim().length < 2) errors.name = '请输入至少 2 个字符的用户姓名';
+        if (!/^1[3-9]\d{9}$/.test(values.phone)) errors.phone = '请输入有效的 11 位手机号码';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) errors.email = '请输入有效的电子邮箱';
+        if (!values.department) errors.department = '请选择所属部门';
+        if (!values.role) errors.role = '请选择用户角色';
+        if (users.some(user => user.id !== editingId && user.phone === values.phone)) errors.phone = '该手机号码已被其他用户使用';
+        if (users.some(user => user.id !== editingId && user.email.toLowerCase() === values.email.toLowerCase())) errors.email = '该电子邮箱已被其他用户使用';
+        return errors;
+      }
+      function clearFormErrors() {
+        $$('.form-error').forEach(node => node.textContent = '');
+        $$('#userForm .input, #userForm .select').forEach(node => node.removeAttribute('aria-invalid'));
+      }
+      function showFormErrors(errors) {
+        clearFormErrors();
+        Object.entries(errors).forEach(([name, message]) => {
+          $(`[data-error-for="${name}"]`).textContent = message;
+          const field = $('#userForm').elements[name];
+          field.setAttribute('aria-invalid', 'true');
+        });
+        $('#userForm').elements[Object.keys(errors)[0]]?.focus();
+      }
+
+      function openDetail(id, trigger) {
+        const user = users.find(item => item.id === id);
+        if (!user) return showToast('用户不存在或已被删除', 'error');
+        detailId = id;
+        const details = [['用户姓名', user.name],['手机号码', user.phone],['电子邮箱', user.email],['所属部门', user.department],['用户角色', user.role],['账号状态', statusText(user.status)],['用户编号', user.id],['创建时间', user.createdAt]];
+        $('#detailGrid').innerHTML = details.map(([label, value]) => `<div><div class="detail-label">${label}</div><div>${escapeHtml(value || '—')}</div></div>`).join('');
+        $('#detailTitle').textContent = `用户详情 · ${user.name}`;
+        openModal($('#detailMask'), trigger);
+      }
+
+      function openDeleteConfirm(ids, trigger) {
+        deleteTargets = ids.filter(id => users.some(user => user.id === id));
+        if (!deleteTargets.length) return;
+        const names = deleteTargets.map(id => users.find(user => user.id === id).name);
+        $('#confirmText').textContent = deleteTargets.length === 1 ? `确认删除用户“${names[0]}”吗？` : `确认删除已选择的 ${deleteTargets.length} 名用户吗？`;
+        $('#confirmDesc').textContent = deleteTargets.length === 1 ? '删除后无法恢复，该账号将立即无法登录。' : `删除后无法恢复，${deleteTargets.length} 个账号将立即无法登录。`;
+        openModal($('#confirmMask'), trigger);
+      }
+
+      window.showToast = function(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        $('#toastContainer').appendChild(toast);
+        setTimeout(() => toast.remove(), 2600);
+      };
+
+      $('#searchForm').addEventListener('submit', event => { event.preventDefault(); applyFilters(); });
+      $('#resetBtn').addEventListener('click', () => { $('#searchForm').reset(); applyFilters(); });
+      $('#expandBtn').addEventListener('click', event => {
+        const expanded = event.currentTarget.getAttribute('aria-expanded') === 'true';
+        event.currentTarget.setAttribute('aria-expanded', String(!expanded));
+        event.currentTarget.textContent = expanded ? '展开⌄' : '收起⌃';
+        $$('.search-item.is-extra').forEach(item => item.hidden = expanded);
+      });
+      $('#addBtn').addEventListener('click', event => openEditor(null, event.currentTarget));
+      $('#exportBtn').addEventListener('click', () => {
+        if (!filteredUsers.length) return showToast('当前没有可导出的用户数据', 'error');
+        const headers = ['用户编号','用户姓名','手机号码','电子邮箱','所属部门','用户角色','账号状态','创建时间'];
+        const csvCell = value => `"${String(value).replace(/"/g, '""')}"`;
+        const rows = filteredUsers.map(user => [user.id,user.name,user.phone,user.email,user.department,user.role,statusText(user.status),user.createdAt]);
+        const csv = '\ufeff' + [headers, ...rows].map(row => row.map(csvCell).join(',')).join('\n');
+        const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `用户列表-${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        showToast(`已导出 ${filteredUsers.length} 条用户数据`);
+      });
+      $('#batchDeleteBtn').addEventListener('click', event => openDeleteConfirm([...selectedIds], event.currentTarget));
+      $('#clearSelectionBtn').addEventListener('click', () => { selectedIds.clear(); render(); });
+      $('#selectAll').addEventListener('change', event => {
+        const pageRows = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+        pageRows.forEach(user => event.target.checked ? selectedIds.add(user.id) : selectedIds.delete(user.id));
+        render();
+      });
+      $('#prevPage').addEventListener('click', () => { currentPage--; render(); });
+      $('#nextPage').addEventListener('click', () => { currentPage++; render(); });
+      $('#pageSize').addEventListener('change', event => { pageSize = Number(event.target.value); currentPage = 1; selectedIds.clear(); render(); });
+
+      $('#userForm').addEventListener('submit', event => {
+        event.preventDefault();
+        const values = Object.fromEntries(new FormData(event.currentTarget));
+        values.name = values.name.trim(); values.phone = values.phone.trim(); values.email = values.email.trim();
+        const errors = validateForm(values);
+        if (Object.keys(errors).length) return showFormErrors(errors);
+        if (editingId) {
+          const index = users.findIndex(user => user.id === editingId);
+          users[index] = {...users[index], ...values};
+          showToast(`用户“${values.name}”已更新`);
+        } else {
+          const nextNumber = Math.max(10000, ...users.map(user => Number(user.id.slice(1)) || 0)) + 1;
+          users.unshift({id:`U${nextNumber}`, ...values, createdAt:nowText()});
+          showToast(`用户“${values.name}”已新增`);
+        }
+        persistUsers();
+        closeModal('editor');
+        applyFilters(false);
+      });
+
+      $('#detailEditBtn').addEventListener('click', event => {
+        const id = detailId;
+        closeModal('detail', false);
+        openEditor(id, event.currentTarget);
+      });
+      $('#confirmDeleteBtn').addEventListener('click', () => {
+        const count = deleteTargets.length;
+        users = users.filter(user => !deleteTargets.includes(user.id));
+        deleteTargets.forEach(id => selectedIds.delete(id));
+        persistUsers();
+        closeModal('confirm');
+        applyFilters(false);
+        showToast(count === 1 ? '用户已删除' : `已删除 ${count} 名用户`);
+      });
+
+      $$('[data-close]').forEach(button => button.addEventListener('click', () => closeModal(button.dataset.close)));
+      $$('.modal-mask').forEach(mask => mask.addEventListener('mousedown', event => { if (event.target === mask) closeModal(mask.id.replace('Mask', '')); }));
+      document.addEventListener('mouseover', event => {
+        const target = event.target.closest('.ellipsis-text');
+        if (target) showOverflowTooltip(target);
+      });
+      document.addEventListener('mouseout', event => { if (event.target.closest('.ellipsis-text')) hideOverflowTooltip(); });
+      document.addEventListener('focusin', event => {
+        const target = event.target.closest('.ellipsis-text');
+        if (target) showOverflowTooltip(target);
+      });
+      document.addEventListener('focusout', event => { if (event.target.closest('.ellipsis-text')) hideOverflowTooltip(); });
+      window.addEventListener('resize', () => { hideOverflowTooltip(); updateOverflowTooltips(); });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          const openMask = $$('.modal-mask.open').pop();
+          if (openMask) closeModal(openMask.id.replace('Mask', ''));
+        }
+        if (event.key === 'Tab') {
+          const openMask = $$('.modal-mask.open').pop();
+          if (!openMask) return;
+          const focusables = $$('button:not([disabled]), input:not([disabled]), select:not([disabled])', openMask);
+          if (!focusables.length) return;
+          const first = focusables[0], last = focusables[focusables.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+
+      const query = new URLSearchParams(location.search);
+      ['name','phone','department','role','status'].forEach(key => { if (query.has(key) && $('#searchForm').elements[key]) $('#searchForm').elements[key].value = query.get(key); });
+      if (query.has('role') || query.has('status')) $('#expandBtn').click();
+      applyFilters(false);
+    })();
+  </script>
+</body>
+</html>

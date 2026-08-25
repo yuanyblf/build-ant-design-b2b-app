@@ -123,8 +123,15 @@ def validate(data: dict[str, Any]) -> None:
     if data["form"].get("labelWrap") is not False:
         fail("form.labelWrap must be false")
 
+    product = data["product"]
+    if product.get("contentWidthMode") != "fluid" or product.get("contentWidth") != "100%":
+        fail("product content width must be fluid and 100%")
+    if product.get("uniformOuterGutter") is not True:
+        fail("product.uniformOuterGutter must be true")
+    if product.get("allowReadableContentMaxWidth") is not True:
+        fail("product.allowReadableContentMaxWidth must be true")
+
     positive_paths = [
-        ("product.contentMaxWidth", data["product"].get("contentMaxWidth")),
         ("product.pageGutter", data["product"].get("pageGutter")),
         ("layout.sidebarWidth", data["layout"].get("sidebarWidth")),
         ("layout.logoWidth", data["layout"].get("logoWidth")),
@@ -146,10 +153,68 @@ def validate(data: dict[str, Any]) -> None:
     if data["table"]["pageSize"] not in options:
         fail("table.pageSize must be included in table.pageSizeOptions")
 
-    token = data["theme"].get("token")
-    components = data["theme"].get("components")
+    theme = data["theme"]
+    token = theme.get("token")
+    components = theme.get("components")
     if not isinstance(token, dict) or not isinstance(components, dict):
         fail("theme.token and theme.components must be objects")
+    if token.get("colorPrimary") != "#2A56DE":
+        fail("theme.token.colorPrimary must be #2A56DE")
+    if token.get("colorInfo") != token.get("colorPrimary"):
+        fail("theme.token.colorInfo must match colorPrimary")
+    custom_token = theme.get("customToken")
+    if not isinstance(custom_token, dict) or custom_token.get("colorSecondary") != "#FF6B06":
+        fail("theme.customToken.colorSecondary must be #FF6B06")
+    color_usage = theme.get("colorUsage")
+    if not isinstance(color_usage, dict):
+        fail("theme.colorUsage must be an object")
+    if color_usage.get("interactive") != "colorPrimary":
+        fail("theme.colorUsage.interactive must be colorPrimary")
+    if color_usage.get("secondary") != ["special-emphasis", "individual-tags"]:
+        fail("theme.colorUsage.secondary must contain special-emphasis and individual-tags")
+    table_theme = components.get("Table") or {}
+    if table_theme.get("headerBg") != "#FAFAFA":
+        fail("theme.components.Table.headerBg must be #FAFAFA")
+    select_theme = components.get("Select") or {}
+    if select_theme.get("showArrowPaddingInlineEnd") != 18:
+        fail("theme.components.Select.showArrowPaddingInlineEnd must be 18")
+    navigation = theme.get("navigation")
+    if not isinstance(navigation, dict) or navigation.get("defaultMode") != "light":
+        fail("theme.navigation.defaultMode must be light")
+    navigation_modes = navigation.get("modes")
+    if not isinstance(navigation_modes, dict) or set(navigation_modes) != {"light", "dark"}:
+        fail("theme.navigation.modes must define light and dark")
+    for mode_name in ("light", "dark"):
+        mode = navigation_modes.get(mode_name)
+        if not isinstance(mode, dict):
+            fail(f"theme.navigation.modes.{mode_name} must be an object")
+        for color_name in ("headerBg", "siderBg", "headerTextColor"):
+            if not isinstance(mode.get(color_name), str) or not mode[color_name].strip():
+                fail(f"theme.navigation.modes.{mode_name}.{color_name} must be a non-empty color string")
+        if mode.get("menuTheme") != mode_name:
+            fail(f"theme.navigation.modes.{mode_name}.menuTheme must be {mode_name}")
+
+    table = data["table"]
+    table_invariants = {
+        "containerWidth": "fill-available",
+        "allowSemanticColumnWidth": True,
+        "allowHorizontalScrollBelowMinimum": True,
+        "columnLayout": "information-left-actions-right",
+        "dataColumnsReadOnly": True,
+        "singleFieldPerColumnByDefault": True,
+        "compositeFieldRequiresExplicitScenario": True,
+        "allowNavigableLinksInDataColumns": True,
+        "actionColumnSide": "right",
+        "actionColumnAlign": "right",
+        "headerBackgroundToken": "Table.headerBg",
+        "headerBackgroundConsistent": True,
+        "autoMeasureLongContent": True,
+        "longContentOverflow": "ellipsis-with-tooltip",
+        "preventContentOverlap": True,
+    }
+    for name, expected in table_invariants.items():
+        if table.get(name) != expected:
+            fail(f"table.{name} must be {expected}")
 
     if data["layout"].get("pattern") != "top-app-left-app-menu-content":
         fail("layout.pattern must be top-app-left-app-menu-content")
@@ -185,10 +250,50 @@ def validate(data: dict[str, Any]) -> None:
 
     if data["components"].get("primaryButtonMaxPerModule") != 1:
         fail("components.primaryButtonMaxPerModule must be 1")
-    if data["components"].get("primaryActionPosition") != "left":
-        fail("components.primaryActionPosition must be left")
     if data["components"].get("buttonFallbackEmphasis") != "secondary":
         fail("components.buttonFallbackEmphasis must be secondary")
+    action_groups = data["components"].get("actionGroups")
+    if not isinstance(action_groups, dict):
+        fail("components.actionGroups must be an object")
+    fixed_action_groups = {
+        "formSubmit": {"align": "right", "order": ["secondary", "primary"]},
+        "listQuery": {"align": "right", "order": ["primary-business", "utility", "view-toggle"]},
+        "tableToolbar": {
+            "layout": "information-left-actions-right",
+            "informationAlign": "left",
+            "actionsAlign": "right",
+            "order": ["danger-or-secondary", "positive-primary"],
+        },
+        "tableRow": {"align": "right", "order": ["detail", "edit", "copy", "enable-disable", "delete"]},
+    }
+    for group_name, expected in fixed_action_groups.items():
+        group = action_groups.get(group_name)
+        if not isinstance(group, dict):
+            fail(f"components.actionGroups.{group_name} must be an object")
+        for name, value in expected.items():
+            if group.get(name) != value:
+                fail(f"components.actionGroups.{group_name}.{name} must be {value}")
+    if action_groups["listQuery"].get("allowSeparateViewToggle") is not True:
+        fail("components.actionGroups.listQuery.allowSeparateViewToggle must be true")
+    query_buttons = action_groups["listQuery"].get("buttons")
+    expected_query_buttons = [
+        {"action": "query", "label": "查询", "icon": "SearchOutlined", "variant": "primary"},
+        {"action": "reset", "label": "重置", "icon": "ReloadOutlined", "variant": "default"},
+        {"action": "expand-collapse", "label": "展开/收起", "icon": "DownOutlined/UpOutlined", "variant": "default"},
+    ]
+    if query_buttons != expected_query_buttons:
+        fail("components.actionGroups.listQuery.buttons must use the standard icon and variant mapping")
+    table_row = action_groups["tableRow"]
+    row_invariants = {
+        "operationColumn": "right",
+        "deletePosition": "last",
+        "deleteEmphasis": "danger",
+        "statusActionMutuallyExclusive": True,
+        "overflowMode": "more-menu-preserve-order",
+    }
+    for name, expected in row_invariants.items():
+        if table_row.get(name) != expected:
+            fail(f"components.actionGroups.tableRow.{name} must be {expected}")
 
     patterns = data["pagePatterns"]
     if patterns.get("menuDefaultTarget") != "list":
@@ -229,16 +334,26 @@ def validate(data: dict[str, Any]) -> None:
         fail("pagePatterns.list.queryResponsiveColumns must be [4, 2, 1]")
     if list_pattern.get("queryActionsStayRowEnd") is not True:
         fail("pagePatterns.list.queryActionsStayRowEnd must be true")
+    if list_pattern.get("queryTableContentLeftAligned") is not True:
+        fail("pagePatterns.list.queryTableContentLeftAligned must be true")
+    if list_pattern.get("containerWidth") != "fill-available":
+        fail("pagePatterns.list.containerWidth must be fill-available")
+    if list_pattern.get("uniformOuterGutter") is not True:
+        fail("pagePatterns.list.uniformOuterGutter must be true")
     if list_pattern.get("showTableTitle") is not False:
         fail("pagePatterns.list.showTableTitle must be false")
-    if list_pattern.get("tableActionsPosition") != "header-left":
-        fail("pagePatterns.list.tableActionsPosition must be header-left")
+    if list_pattern.get("tableToolbarLayout") != "information-left-actions-right":
+        fail("pagePatterns.list.tableToolbarLayout must be information-left-actions-right")
+    if list_pattern.get("tableInformationPosition") != "header-left":
+        fail("pagePatterns.list.tableInformationPosition must be header-left")
+    if list_pattern.get("tableActionsPosition") != "header-right":
+        fail("pagePatterns.list.tableActionsPosition must be header-right")
     if list_pattern.get("queryOrder") not in {"table-column-order", "custom"}:
         fail("pagePatterns.list.queryOrder must be table-column-order or custom")
     if list_pattern.get("requiredHint") != "tooltip-on-query":
         fail("pagePatterns.list.requiredHint must be tooltip-on-query")
-    if list_pattern.get("longContent") not in {"show-all-unless-specified", "ellipsis-with-tooltip"}:
-        fail("pagePatterns.list.longContent has an unsupported value")
+    if list_pattern.get("longContent") != "auto-ellipsis-with-tooltip":
+        fail("pagePatterns.list.longContent must be auto-ellipsis-with-tooltip")
     left_tree_filter = list_pattern.get("leftTreeFilter")
     if left_tree_filter is not None:
         validate_left_tree_filter(left_tree_filter)
@@ -251,8 +366,12 @@ def validate(data: dict[str, Any]) -> None:
         fail("pagePatterns.formLabelWidth must be a positive integer")
     if patterns.get("formLabelWrap") is not False:
         fail("pagePatterns.formLabelWrap must be false")
-    if patterns.get("formControlWidth") != "fill":
-        fail("pagePatterns.formControlWidth must be fill")
+    if patterns.get("formControlWidth") != "semantic-adaptive":
+        fail("pagePatterns.formControlWidth must be semantic-adaptive")
+    if data["form"].get("containerWidth") != "fill-available":
+        fail("form.containerWidth must be fill-available")
+    if data["form"].get("controlWidth") != "semantic-adaptive":
+        fail("form.controlWidth must be semantic-adaptive")
     if patterns.get("formNarrowLayout") != "vertical":
         fail("pagePatterns.formNarrowLayout must be vertical")
     if patterns.get("detailTypes") != ["basic", "advanced"]:
@@ -294,8 +413,10 @@ def validate(data: dict[str, Any]) -> None:
     modal = patterns.get("modal")
     if not isinstance(modal, dict):
         fail("pagePatterns.modal must be an object")
-    if modal.get("confirmOnLeft") is not True:
-        fail("pagePatterns.modal.confirmOnLeft must be true")
+    if modal.get("footerAlign") != "right":
+        fail("pagePatterns.modal.footerAlign must be right")
+    if modal.get("footerOrder") != ["cancel", "confirm"]:
+        fail("pagePatterns.modal.footerOrder must be cancel followed by confirm")
     if not isinstance(modal.get("cancelText"), str) or not modal.get("cancelText"):
         fail("pagePatterns.modal.cancelText must be a non-empty string")
     if not isinstance(modal.get("confirmText"), str) or not modal.get("confirmText"):
@@ -318,9 +439,18 @@ def ts_literal(value: Any) -> str:
 
 def generate(data: dict[str, Any], out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
+    default_navigation = data["theme"]["navigation"]["modes"][data["theme"]["navigation"]["defaultMode"]]
+    layout_components = {
+        **data["theme"]["components"].get("Layout", {}),
+        "headerBg": default_navigation["headerBg"],
+        "siderBg": default_navigation["siderBg"],
+    }
     theme = {
         "token": data["theme"]["token"],
-        "components": data["theme"]["components"],
+        "components": {
+            **data["theme"]["components"],
+            "Layout": layout_components,
+        },
     }
     (out_dir / "antd-theme.generated.ts").write_text(
         "// Generated by apply_standards.py. Do not edit.\n"

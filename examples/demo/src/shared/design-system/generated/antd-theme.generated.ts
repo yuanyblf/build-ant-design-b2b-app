@@ -3,11 +3,11 @@ import type { ThemeConfig } from 'antd';
 
 export const antdTheme = {
   "token": {
-    "colorPrimary": "#1677ff",
+    "colorPrimary": "#2A56DE",
     "colorSuccess": "#52c41a",
     "colorWarning": "#faad14",
     "colorError": "#ff4d4f",
-    "colorInfo": "#1677ff",
+    "colorInfo": "#2A56DE",
     "colorText": "#171A1D",
     "colorTextSecondary": "#747677",
     "colorTextTertiary": "#A2A3A5",
@@ -19,10 +19,10 @@ export const antdTheme = {
   },
   "components": {
     "Layout": {
-      "headerBg": "#FFFFFF",
-      "siderBg": "#FFFFFF",
       "bodyBg": "#F5F6F8",
-      "headerHeight": 56
+      "headerHeight": 50,
+      "headerBg": "#FFFFFF",
+      "siderBg": "#FFFFFF"
     },
     "Menu": {
       "itemHeight": 40,
@@ -31,10 +31,14 @@ export const antdTheme = {
     },
     "Table": {
       "cellPaddingBlock": 12,
-      "cellPaddingInline": 12
+      "cellPaddingInline": 12,
+      "headerBg": "#FAFAFA"
     },
     "Form": {
       "itemMarginBottom": 20
+    },
+    "Select": {
+      "showArrowPaddingInlineEnd": 18
     },
     "Modal": {
       "titleFontSize": 16

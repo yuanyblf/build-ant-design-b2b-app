@@ -23,14 +23,21 @@ export function App() {
   const [applicationCardOpen, setApplicationCardOpen] = useState(false);
   const [page, setPage] = useState(hasSharedDepartmentFilter ? 'employees' : 'dashboard');
   const [detailOrder, setDetailOrder] = useState<Order>();
+  const navigationMode = b2bStandards.theme.navigation.defaultMode;
+  const navigationTokens = b2bStandards.theme.navigation.modes[navigationMode];
   const layoutStyle = {
     '--header-height': `${b2bStandards.theme.components.Layout.headerHeight}px`,
-    '--content-max-width': `${b2bStandards.product.contentMaxWidth}px`,
+    '--content-width': b2bStandards.product.contentWidth,
     '--page-gutter': `${b2bStandards.product.pageGutter}px`,
     '--page-gutter-compact': `${b2bStandards.product.pageGutterCompact}px`,
     '--logo-width': `${b2bStandards.layout.logoWidth}px`,
     '--border-color': b2bStandards.border.color,
     '--spacing-md': `${b2bStandards.spacing.md}px`,
+    '--header-bg': navigationTokens.headerBg,
+    '--sider-bg': navigationTokens.siderBg,
+    '--header-text-color': navigationTokens.headerTextColor,
+    '--color-primary': b2bStandards.theme.token.colorPrimary,
+    '--color-secondary': b2bStandards.theme.customToken.colorSecondary,
   } as CSSProperties;
   const applications = [
     { key: 'workbench', label: '工作台', category: '通用', icon: <DashboardOutlined />, defaultPage: 'dashboard' },
@@ -159,7 +166,7 @@ export function App() {
       <Header className="app-header">
         <div className="brand"><img className="brand-logo" src="/assets/default-logo.png" alt="云悦 CLOUDJOY" /></div>
         <nav className="application-nav" aria-label="应用切换">
-          <Menu className="application-menu" mode="horizontal" selectedKeys={[application]} onClick={({ key }) => changeApplication(key)} items={directApplications} />
+          <Menu className="application-menu" mode="horizontal" theme={navigationTokens.menuTheme} selectedKeys={[application]} onClick={({ key }) => changeApplication(key)} items={directApplications} />
           <Popover content={applicationCard} trigger={['hover', 'click']} placement="bottom" open={applicationCardOpen} onOpenChange={setApplicationCardOpen} overlayClassName="application-popover">
             <Button className={`application-switcher ${!directApplications.some(item => item.key === application) ? 'is-active' : ''}`} type="text" icon={<AppstoreOutlined />}>全部应用</Button>
           </Popover>
@@ -172,8 +179,8 @@ export function App() {
         </div>
       </Header>
       <Layout className="app-body">
-        <Sider width={b2bStandards.layout.sidebarWidth} collapsedWidth={b2bStandards.layout.sidebarCollapsedWidth} theme="light" className="app-sider">
-          <Menu mode="inline" selectedKeys={[page]} defaultOpenKeys={['workbench-overview','organization-members','product-center','order-center','experience-content','experience-activities','experience-groups','training-course-operation','training-learning-operation','care-operation','care-content','operation-apps']} onClick={({ key }) => setPage(key)} items={sideItems} />
+        <Sider width={b2bStandards.layout.sidebarWidth} collapsedWidth={b2bStandards.layout.sidebarCollapsedWidth} theme={navigationTokens.menuTheme} className="app-sider">
+          <Menu theme={navigationTokens.menuTheme} mode="inline" selectedKeys={[page]} defaultOpenKeys={['workbench-overview','organization-members','product-center','order-center','experience-content','experience-activities','experience-groups','training-course-operation','training-learning-operation','care-operation','care-content','operation-apps']} onClick={({ key }) => setPage(key)} items={sideItems} />
         </Sider>
         <Content className="app-content">{renderPage()}</Content>
       </Layout>
