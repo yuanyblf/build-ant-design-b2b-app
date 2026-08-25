@@ -3,7 +3,7 @@ import { Button, Card, Col, Flex, Progress, Row, Statistic, Tag, Typography } fr
 
 export function DashboardPage({ onOpenEmployees }: { onOpenEmployees: () => void }) {
   const stats = [
-    { title: '员工总数', value: 1286, suffix: '人', icon: <TeamOutlined />, color: '#1677ff' },
+    { title: '员工总数', value: 1286, suffix: '人', icon: <TeamOutlined />, color: '#2A56DE' },
     { title: '本月入职', value: 36, suffix: '人', icon: <UserAddOutlined />, color: '#52c41a' },
     { title: '待完善资料', value: 18, suffix: '项', icon: <ClockCircleOutlined />, color: '#faad14' },
     { title: '资料完整率', value: 96.8, suffix: '%', icon: <CheckCircleOutlined />, color: '#722ed1' },

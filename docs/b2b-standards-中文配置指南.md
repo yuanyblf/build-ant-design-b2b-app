@@ -17,13 +17,16 @@
 ```json
 {
   "product": {
-    "contentMaxWidth": 1440,
+    "contentWidthMode": "fluid",
+    "contentWidth": "100%",
+    "allowReadableContentMaxWidth": true,
     "pageGutter": 24,
-    "pageGutterCompact": 16
+    "pageGutterCompact": 16,
+    "uniformOuterGutter": true
   },
   "theme": {
     "components": {
-      "Layout": { "headerHeight": 56 }
+      "Layout": { "headerHeight": 50 }
     }
   },
   "layout": {
@@ -48,10 +51,12 @@
 
 | 配置项 | 中文含义 | 当前值 | 推荐范围 | 修改效果 |
 |---|---|---:|---:|---|
-| `product.contentMaxWidth` | 主内容最大宽度 | 1440 | 1200～1600 | 大屏时限制内容区域宽度 |
+| `product.contentWidthMode` | 主内容宽度模式 | `fluid` | 不修改 | 页面内容随可用空间伸缩 |
+| `product.contentWidth` | 主内容宽度 | `100%` | 不修改 | 禁止业务页面写死整体容器宽度 |
+| `product.allowReadableContentMaxWidth` | 阅读内容可使用最大宽度 | true | true／false | 允许长文本、说明页等单独限制阅读宽度 |
 | `product.pageGutter` | 桌面端页面边距 | 24 | 16～32 | 控制内容与页面边缘的距离 |
 | `product.pageGutterCompact` | 窄屏页面边距 | 16 | 12～20 | 控制平板和手机页面边距 |
-| `theme.components.Layout.headerHeight` | 顶部导航高度 | 56 | 48～64 | 控制顶部栏和左侧品牌区高度 |
+| `theme.components.Layout.headerHeight` | 顶部导航高度 | 50 | 48～64 | 控制顶部栏和左侧品牌区高度 |
 | `layout.pattern` | 固定应用骨架 | `top-app-left-app-menu-content` | 不修改 | 顶部应用、左侧应用菜单、右侧功能区 |
 | `layout.topLevelType` | 顶层对象类型 | `application` | 不修改 | 明确顶部切换的是应用，不是菜单层级 |
 | `layout.leftNavigationType` | 左侧导航类型 | `application-menu` | 不修改 | 左侧只展示当前应用的菜单 |
@@ -74,7 +79,8 @@
 "product": {
   "locale": "zh-CN",
   "density": "small",
-  "contentMaxWidth": 1280,
+  "contentWidthMode": "fluid",
+  "contentWidth": "100%",
   "pageGutter": 16,
   "pageGutterCompact": 12
 },
@@ -102,7 +108,8 @@
 "product": {
   "locale": "zh-CN",
   "density": "large",
-  "contentMaxWidth": 1600,
+  "contentWidthMode": "fluid",
+  "contentWidth": "100%",
   "pageGutter": 32,
   "pageGutterCompact": 20
 },
@@ -125,7 +132,7 @@
 ```json
 "theme": {
   "token": {
-    "colorPrimary": "#1677ff",
+    "colorPrimary": "#2A56DE",
     "colorSuccess": "#52c41a",
     "colorWarning": "#faad14",
     "colorError": "#ff4d4f",
@@ -133,16 +140,36 @@
     "colorTextSecondary": "#747677",
     "borderRadius": 6,
     "controlHeight": 32
+  },
+  "customToken": {
+    "colorSecondary": "#FF6B06"
+  },
+  "colorUsage": {
+    "interactive": "colorPrimary",
+    "secondary": ["special-emphasis", "individual-tags"]
   }
 }
 ```
 
-- `colorPrimary`：主按钮、选中项和链接的品牌色。
+- `colorPrimary`：主品牌色；主按钮、选中项、链接和其他可交互字段统一使用该颜色。
+- `colorSecondary`：辅助色；仅用于特殊强调和个别标签，不用于常规链接或主按钮。
 - `colorSuccess`／`colorWarning`／`colorError`：成功、警告、错误状态色。
 - `colorText`：主要正文颜色。
 - `colorTextSecondary`：辅助说明文字颜色。
 - `borderRadius`：按钮、输入框、卡片等基础圆角。
 - `controlHeight`：输入框、按钮等基础控件高度。
+
+顶部 Header 与左侧菜单使用同一个导航模式配置。必须同时保留浅色、深色两套模式；业务提示未明确要求深色时使用浅色：
+
+```json
+"navigation": {
+  "defaultMode": "light",
+  "modes": {
+    "light": { "headerBg": "#FFFFFF", "siderBg": "#FFFFFF", "headerTextColor": "#171A1D", "menuTheme": "light" },
+    "dark": { "headerBg": "#001529", "siderBg": "#001529", "headerTextColor": "#FFFFFF", "menuTheme": "dark" }
+  }
+}
+```
 
 ## 修改间距与边框
 
@@ -172,12 +199,7 @@
 
 ```json
 "components": {
-  "Layout": {
-    "headerBg": "#FFFFFF",
-    "siderBg": "#FFFFFF",
-    "bodyBg": "#F5F6F8",
-    "headerHeight": 56
-  },
+  "Layout": { "bodyBg": "#F5F6F8", "headerHeight": 50 },
   "Menu": {
     "itemHeight": 40,
     "itemBorderRadius": 6,
@@ -199,17 +221,27 @@
 
 只使用 Ant Design 当前版本公开的组件 Token；不要通过覆盖内部类名修改组件。
 
-按钮强调规则位于顶层 `components`：
+按钮强调与顺序规则位于顶层 `components.actionGroups`，按场景配置而不是全局固定主按钮方向：
 
 ```json
 "components": {
   "primaryButtonMaxPerModule": 1,
-  "primaryActionPosition": "left",
-  "buttonFallbackEmphasis": "secondary"
+  "buttonFallbackEmphasis": "secondary",
+  "actionGroups": {
+    "formSubmit": { "align": "right", "order": ["secondary", "primary"] },
+    "listQuery": { "align": "right", "order": ["primary-business", "utility", "view-toggle"] },
+    "tableToolbar": {
+      "layout": "information-left-actions-right",
+      "informationAlign": "left",
+      "actionsAlign": "right",
+      "order": ["danger-or-secondary", "positive-primary"]
+    },
+    "tableRow": { "align": "right", "order": ["detail", "edit", "copy", "enable-disable", "delete"] }
+  }
 }
 ```
 
-表示每个模块最多出现一个主按钮；无法判断按钮强调级别时使用次按钮。该规则来自 CoDesign 按钮规范，不建议在项目中修改。
+表示每个模块最多出现一个主按钮；无法判断按钮强调级别时使用次按钮。提交区为“取消 → 保存”；查询区使用标准图标文字按钮“查询 → 重置 → 展开”；表格工具栏按“只读文本居左、操作按钮组居右”分区，按钮组示例为“批量删除 → 导出 → 新增”；行内操作按“详情 → 编辑 → 复制 → 启用／禁用 → 删除”，删除最右且为危险色。
 
 ## 修改字号
 
@@ -241,7 +273,22 @@
   "stickyHeader": true,
   "actionsMaxVisible": 3,
   "fixedActionColumn": true,
-  "emptyText": "暂无数据"
+  "containerWidth": "fill-available",
+  "allowSemanticColumnWidth": true,
+  "allowHorizontalScrollBelowMinimum": true,
+  "emptyText": "暂无数据",
+  "columnLayout": "information-left-actions-right",
+  "dataColumnsReadOnly": true,
+  "singleFieldPerColumnByDefault": true,
+  "compositeFieldRequiresExplicitScenario": true,
+  "allowNavigableLinksInDataColumns": true,
+  "actionColumnSide": "right",
+  "actionColumnAlign": "right",
+  "headerBackgroundToken": "Table.headerBg",
+  "headerBackgroundConsistent": true,
+  "autoMeasureLongContent": true,
+  "longContentOverflow": "ellipsis-with-tooltip",
+  "preventContentOverlap": true
 }
 ```
 
@@ -249,6 +296,10 @@
 - 不允许用户修改每页数量：将 `showSizeChanger` 改为 `false`。
 - 行内最多直接显示两个操作：将 `actionsMaxVisible` 改为 `2`，其余操作应收进“更多”。
 - 不固定操作列：将 `fixedActionColumn` 改为 `false`。
+- 数据列统一放在左侧并保持只读，查看详情等导航链接可以保留；变更类动作放在最右侧操作列并右对齐。
+- 默认一列只展示一个字段；头像、姓名、邮箱等仅在明确的身份识别场景允许组成复合字段。
+- 表头选择列、数据列和固定操作列统一使用 `Table.headerBg`，不能让固定列表头单独变白。
+- 页面根据字段内容与可用列宽自动判断溢出，超长内容显示省略号，并在 Hover 或键盘聚焦时用 Tooltip 展示全文；不得遮挡相邻字段或操作列。
 
 ## 修改列表页和弹窗／抽屉判断
 
@@ -310,14 +361,19 @@
   "queryActionsAlign": "right-center",
   "queryResponsiveColumns": [4, 2, 1],
   "queryActionsStayRowEnd": true,
+  "queryTableContentLeftAligned": true,
+  "containerWidth": "fill-available",
+  "uniformOuterGutter": true,
   "showTableTitle": false,
-  "tableActionsPosition": "header-left",
+  "tableToolbarLayout": "information-left-actions-right",
+  "tableInformationPosition": "header-left",
+  "tableActionsPosition": "header-right",
   "queryOrder": "table-column-order",
   "dateRangeDefault": true,
   "dateRangeRequired": false,
   "requiredHint": "tooltip-on-query",
   "linkNavigableContent": true,
-  "longContent": "show-all-unless-specified",
+  "longContent": "auto-ellipsis-with-tooltip",
   "leftTreeFilter": {
     "applicableTo": "hierarchical-dimension",
     "panel": {
@@ -355,7 +411,7 @@
 "formItemLayout": "label-control-inline",
 "formLabelWidth": 112,
 "formLabelWrap": false,
-"formControlWidth": "fill",
+"formControlWidth": "semantic-adaptive",
 "formNarrowLayout": "vertical",
 "advancedFormStickyFooter": true,
 "detailTypes": ["basic", "advanced"],
@@ -383,7 +439,8 @@
   "fieldHelpRequired": true,
   "cancelText": "取消",
   "confirmText": "确认",
-  "confirmOnLeft": true
+  "footerAlign": "right",
+  "footerOrder": ["cancel", "confirm"]
 }
 ```
 
@@ -403,14 +460,18 @@
 - `list.queryActionsAlign`：固定为 `right-center`，按钮组在自己的网格项内右对齐、垂直居中。
 - `list.queryResponsiveColumns`：查询区随页面宽度依次使用 4 列、2 列、1 列。
 - `list.queryActionsStayRowEnd`：固定为 `true`；字段发生响应式折行后，按钮组仍占当前行最后一列并靠右，不能出现在第二行左侧。
+- `list.queryTableContentLeftAligned`：固定为 `true`；查询区内容与表格内容共用同一左边界。
+- `list.containerWidth`／`uniformOuterGutter`：列表区占满可用内容宽度，并在页面四周使用统一响应式留白。
 - `list.showTableTitle`：列表页表格区不展示独立标题。
-- `list.tableActionsPosition`：表格级操作位于表格上方左侧，并与第一列表头左边界对齐。
+- `list.tableToolbarLayout`：固定为 `information-left-actions-right`，表示表格顶部工具栏按信息区和操作区左右分组。
+- `list.tableInformationPosition`：只读文本位于表格上方左侧，包括总数、已选数量和作用范围等信息。
+- `list.tableActionsPosition`：新增、导出和批量操作等按钮组位于表格上方右侧。
 - `list.queryOrder`：默认按表格列顺序排列查询项；特殊场景可改成 `custom`，并在需求中列明顺序。
 - `list.dateRangeDefault`：日期起止默认使用范围选择器。
 - `list.dateRangeRequired`：默认 `false`，表示开始和结束都非必填。
 - `list.requiredHint`：必填查询项为空时，点击查询后使用 Tooltip 提示，不显示星号。
 - `list.linkNavigableContent`：可跳转内容使用链接形式。
-- `list.longContent`：默认完整展示；需要统一截断时可改为 `ellipsis-with-tooltip`。
+- `list.longContent`：固定为 `auto-ellipsis-with-tooltip`；按内容和列宽自动判断溢出，超出后省略并展示完整内容 Tooltip。
 - `list.leftTreeFilter`：可选配置；部门、组织、分类等层级维度需要左树右列表时使用，未使用该模式的既有列表可以不配置。
 - `list.leftTreeFilter.panel`：控制 240px 面板宽度、16px 左右间距、内边距、8px 圆角、阴影、80px 吸顶位置和 160px 视口高度扣减值。尺寸可按产品规范调整，但必须为正数。
 - `list.leftTreeFilter.selectionMode`：固定为 `single`；树是单一层级维度筛选，不在同一树中混合多选语义。
@@ -429,7 +490,7 @@
 - `formItemLayout`：固定为 `label-control-inline`，新建和编辑表单在桌面端保持标签与控件同行。
 - `formLabelWidth`：同一表单的标签固定宽度，单位为 px，默认 112。
 - `formLabelWrap`：固定为 `false`，字段标签禁止换行；字段名过长时应优化文案或增加说明。
-- `formControlWidth`：固定为 `fill`，输入控件占满标签之外的剩余空间并允许收缩。
+- `formControlWidth`：固定为 `semantic-adaptive`；控件容器可占满剩余空间，但实际输入框和下拉框按字段内容、输入预期和布局选择短、中、长或填充宽度。
 - `formNarrowLayout`：窄屏时统一切换为 `vertical`；必须整张表单一起切换，不能单个字段随机换行。
 - `detailColumns`：详情字段桌面端每行列数，可配置为 1、2 或 3，默认 3。
 - `detailEditSurfaceConsistency`：固定为 `same-within-list`，同一列表页的详情与编辑必须使用同一种承载方式。
@@ -448,8 +509,8 @@
 - `cards.titleWrap`：`false` 表示标题不换行，超长使用省略号和完整标题提示。
 - `cards.summaryMaxLines`：图文卡片摘要最多展示两行，超出后省略。
 - `modal`：控制弹窗必填标识、字段说明以及“取消／确认”按钮文案和顺序。
-- `components.primaryActionPosition`：所有按钮组的主操作统一位于最左侧。
-- `modal.confirmOnLeft`：弹窗与确认气泡的确认按钮位于取消按钮左侧。
+- `components.actionGroups`：按提交区、查询区、表格工具栏和行内操作分别定义对齐方式与顺序。查询按钮使用 Search／Reload／Down-Up 标准图标；行内操作保持“详情、编辑、复制、启用／禁用、删除”的相对顺序。
+- `modal.footerAlign`／`footerOrder`：弹窗与抽屉提交区整体右对齐，按钮顺序为“取消 → 确认”。
 
 字段级的默认值、数据源、组件格式、单选／多选、校验和联动属于业务需求，不应写成全局 JSON。产品经理应在字段清单中逐项说明；Skill 会按统一页面规则实现。
 
@@ -462,6 +523,8 @@
 ```json
 "form": {
   "layout": "horizontal",
+  "containerWidth": "fill-available",
+  "controlWidth": "semantic-adaptive",
   "labelWrap": false,
   "validateTrigger": "onBlur",
   "drawerWidth": 560,
@@ -471,6 +534,8 @@
 ```
 
 - `layout` 固定为 `horizontal`，桌面端字段标签与控件同行。
+- `containerWidth` 固定为 `fill-available`；表单容器随页面宽度伸缩。
+- `controlWidth` 固定为 `semantic-adaptive`；短字段控件不得全局拉满。
 - `labelWrap` 固定为 `false`，标签禁止换行；窄屏纵向切换由响应式样式统一处理。
 - `validateTrigger` 为 `onBlur` 时，离开字段后校验；改为 `onChange` 时输入过程中校验。
 - `drawerWidth` 和 `modalWidth` 分别控制抽屉与弹窗默认宽度。
@@ -519,5 +584,5 @@ python3 scripts/generate_design_md.py \
 
 1. 不要直接修改 `DESIGN.md` 或 `src/shared/design-system/generated`，下次生成时会被覆盖。
 2. `b2b-standards.json` 是唯一需要人工维护的配置文件；修改后运行 `npm run generate:standards`。
-3. 不是所有行为配置都会自动变成样式；业务组件需要读取相应配置。这个 Demo 已接入主题 Token、组件 Token、顶部高度、Logo 宽度、侧栏宽度、边框、内容最大宽度和页面边距。
+3. 不是所有行为配置都会自动变成样式；业务组件需要读取相应配置。这个 Demo 已接入主题 Token、组件 Token、顶部高度、Logo 宽度、侧栏宽度、边框、流式内容宽度和页面边距。
 4. 新增配置字段时，需要同步更新校验脚本和消费该字段的页面组件。

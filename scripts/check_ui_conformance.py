@@ -36,8 +36,12 @@ def main() -> int:
         errors.append(f"无法读取 {design_path}：{exc}")
 
     conformance = standards.get("conformance") or {}
+    theme = standards.get("theme") or {}
     form = standards.get("form") or {}
+    table = standards.get("table") or {}
+    product = standards.get("product") or {}
     components = standards.get("components") or {}
+    action_groups = components.get("actionGroups") or {}
     patterns = standards.get("pagePatterns") or {}
     list_pattern = patterns.get("list") or {}
     left_tree_filter = list_pattern.get("leftTreeFilter")
@@ -46,13 +50,37 @@ def main() -> int:
         "conformance.conflictPolicy": conformance.get("conflictPolicy") == "skill-wins",
         "form.layout": form.get("layout") == "horizontal",
         "form.labelWrap": form.get("labelWrap") is False,
-        "components.primaryActionPosition": components.get("primaryActionPosition") == "left",
+        "theme.token.colorPrimary": (theme.get("token") or {}).get("colorPrimary") == "#2A56DE",
+        "theme.customToken.colorSecondary": (theme.get("customToken") or {}).get("colorSecondary") == "#FF6B06",
+        "theme.navigation.defaultMode": (theme.get("navigation") or {}).get("defaultMode") == "light",
+        "product.contentWidthMode": product.get("contentWidthMode") == "fluid",
+        "product.uniformOuterGutter": product.get("uniformOuterGutter") is True,
+        "table.columnLayout": table.get("columnLayout") == "information-left-actions-right",
+        "table.dataColumnsReadOnly": table.get("dataColumnsReadOnly") is True,
+        "table.singleFieldPerColumnByDefault": table.get("singleFieldPerColumnByDefault") is True,
+        "table.compositeFieldRequiresExplicitScenario": table.get("compositeFieldRequiresExplicitScenario") is True,
+        "table.actionColumnSide": table.get("actionColumnSide") == "right",
+        "table.actionColumnAlign": table.get("actionColumnAlign") == "right",
+        "table.headerBackgroundConsistent": table.get("headerBackgroundConsistent") is True,
+        "table.longContentOverflow": table.get("longContentOverflow") == "ellipsis-with-tooltip",
+        "components.actionGroups.formSubmit": (action_groups.get("formSubmit") or {}).get("order") == ["secondary", "primary"],
+        "components.actionGroups.listQuery": (action_groups.get("listQuery") or {}).get("order") == ["primary-business", "utility", "view-toggle"],
+        "components.actionGroups.tableToolbar": (action_groups.get("tableToolbar") or {}).get("order") == ["danger-or-secondary", "positive-primary"],
+        "components.actionGroups.tableToolbar.layout": (action_groups.get("tableToolbar") or {}).get("layout") == "information-left-actions-right",
+        "components.actionGroups.tableToolbar.informationAlign": (action_groups.get("tableToolbar") or {}).get("informationAlign") == "left",
+        "components.actionGroups.tableToolbar.actionsAlign": (action_groups.get("tableToolbar") or {}).get("actionsAlign") == "right",
+        "components.actionGroups.tableRow": (action_groups.get("tableRow") or {}).get("order") == ["detail", "edit", "copy", "enable-disable", "delete"],
         "pagePatterns.detailEditSurfaceConsistency": patterns.get("detailEditSurfaceConsistency") == "same-within-list",
         "list.queryGridColumns": list_pattern.get("queryGridColumns") == 4,
         "list.collapseThreshold": list_pattern.get("collapseThreshold") == 3,
         "list.queryResponsiveColumns": list_pattern.get("queryResponsiveColumns") == [4, 2, 1],
         "list.queryActionsAlign": list_pattern.get("queryActionsAlign") == "right-center",
         "list.queryActionsStayRowEnd": list_pattern.get("queryActionsStayRowEnd") is True,
+        "list.queryTableContentLeftAligned": list_pattern.get("queryTableContentLeftAligned") is True,
+        "list.containerWidth": list_pattern.get("containerWidth") == "fill-available",
+        "list.tableToolbarLayout": list_pattern.get("tableToolbarLayout") == "information-left-actions-right",
+        "list.tableInformationPosition": list_pattern.get("tableInformationPosition") == "header-left",
+        "list.tableActionsPosition": list_pattern.get("tableActionsPosition") == "header-right",
     }
     if isinstance(left_tree_filter, dict):
         left_tree_panel = left_tree_filter.get("panel") or {}
@@ -96,11 +124,10 @@ def main() -> int:
             errors.append(f"{relative}：桌面表单禁止使用 layout=\"vertical\"")
         if re.search(r"<SearchPanel\b[^>]*\bfieldCount=", content):
             errors.append(f"{relative}：查询字段数必须由实际子项计算，禁止手工 fieldCount")
-        for modal in re.findall(r"<Modal\b[^>]*>", content):
-            if "onOk=" in modal and "footer=" not in modal:
-                errors.append(f"{relative}：Modal 使用 onOk 时必须自定义 footer，确保主操作在左")
-        if re.search(r'<Space>\s*<Button(?![^>]*type="primary")[^>]*>取消</Button>\s*<Button[^>]*type="primary"', content):
-            errors.append(f"{relative}：按钮组中取消出现在主操作左侧")
+        if re.search(r"footer=\{\(_, \{ OkBtn, CancelBtn \}\) => <Space><OkBtn /><CancelBtn /></Space>\}", content):
+            errors.append(f"{relative}：弹窗 Footer 必须按取消、确认排列并整体右对齐")
+        if re.search(r'<Drawer\b[^>]*extra=\{<Space><Button[^>]*type="primary"[^>]*>(?:保存|确认|提交)', content):
+            errors.append(f"{relative}：抽屉提交区应将取消等次要按钮放在主按钮之前")
 
     if left_tree_filter_files:
         if not isinstance(left_tree_filter, dict):
@@ -119,10 +146,38 @@ def main() -> int:
             "--search-action-row-4": "SearchPanel 缺少宽屏按钮行定位",
             "--search-action-row-2": "SearchPanel 缺少中屏按钮行定位",
             "--search-action-row-1": "SearchPanel 缺少窄屏按钮行定位",
+            "SearchOutlined": "查询按钮缺少 SearchOutlined",
+            "ReloadOutlined": "重置按钮缺少 ReloadOutlined",
+            "DownOutlined": "展开按钮缺少 DownOutlined",
         }
         for marker, message in markers.items():
             if marker not in content:
                 errors.append(f"{search_panel.relative_to(root)}：{message}")
+        if re.search(r'<Button\s+type="link"[^>]*>\{expanded \? \'收起\' : \'展开\'\}', content):
+            errors.append(f"{search_panel.relative_to(root)}：展开／收起必须使用默认描边按钮，不使用 Link Button")
+
+    styles_path = src / "styles.css"
+    if styles_path.exists():
+        styles = styles_path.read_text(encoding="utf-8")
+        if re.search(r"\.page-stack\s*\{[^}]*max-width", styles, re.S):
+            errors.append(f"{styles_path.relative_to(root)}：页面内容区必须流式占满可用宽度，禁止为 page-stack 设置固定最大宽度")
+        table_toolbar_rule = re.search(r"\.table-toolbar\s*\{([^}]*)\}", styles, re.S)
+        if table_toolbar_rule is None:
+            errors.append(f"{styles_path.relative_to(root)}：缺少表格顶部工具栏布局规则")
+        elif not re.search(r"justify-content\s*:\s*(?:flex-end|space-between)", table_toolbar_rule.group(1)):
+            errors.append(f"{styles_path.relative_to(root)}：表格顶部工具栏必须让操作按钮组靠右，不能使用左对齐")
+
+    if table.get("autoMeasureLongContent") is True:
+        ellipsis_component = src / "shared/ui/TableEllipsisText.tsx"
+        if not ellipsis_component.exists():
+            errors.append("缺少按实际溢出状态展示 Tooltip 的 TableEllipsisText 组件")
+        else:
+            ellipsis_content = ellipsis_component.read_text(encoding="utf-8")
+            for marker in ("scrollWidth", "clientWidth", "ResizeObserver", "Tooltip"):
+                if marker not in ellipsis_content:
+                    errors.append(f"{ellipsis_component.relative_to(root)}：缺少自动溢出判断标记 {marker}")
+            if not any("TableEllipsisText" in content for _, content in [(path, path.read_text(encoding="utf-8")) for path in paths if path != ellipsis_component]):
+                errors.append("已配置自动长字段省略，但代表性页面未使用 TableEllipsisText")
 
     if errors:
         print("UI 规范检查失败：")

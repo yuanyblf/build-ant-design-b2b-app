@@ -30,10 +30,9 @@ description: 使用 React、TypeScript 和 Ant Design 搭建、重构或扩展�
    - 仓库中的 `.b2b/b2b-standards.json`；
    - 仓库中的 `config/b2b-standards.json`；
    - 本 Skill 的 `assets/b2b-standards.json` 默认值。
-3. 读取项目根目录自动生成的 `DESIGN.md`；它是 JSON 规范面向 Agent 的中文表达，不是第二份配置源。缺失或过期时先重新生成。
-4. 使用 `python3 scripts/apply_standards.py --config <配置文件> --check` 校验规范。
-5. 新应用默认采用 React、TypeScript 和 Ant Design；已有项目优先沿用现有技术栈，不为匹配默认值而重构。
-6. 按任务读取所需文档：
+3. 使用 `python3 scripts/apply_standards.py --config <配置文件> --check` 校验规范。
+4. 新应用默认采用 React、TypeScript 和 Ant Design；已有项目优先沿用现有技术栈，不为匹配默认值而重构。
+5. 按任务读取所需文档：
    - 同步设计 Token 或用户提到 CoDesign 时，读取 `references/design-source.md`。
    - 新建基础架构、模块、路由、数据访问或权限时，读取 `references/architecture.md`。
    - 选择和组合页面时，读取 `references/page-patterns.md`。
@@ -77,12 +76,15 @@ description: 使用 React、TypeScript 和 Ant Design 搭建、重构或扩展�
 
 - 顶部通栏：左侧 Logo，中间为“应用”切换区，右侧当前用户及全局操作；顶部应用不计入菜单层级。
 - 主体左侧：直接展示当前应用的“应用菜单”，最多支持两级，不继续增加层级；左侧栏不设置应用标题区。
+- 顶部 Header 与左侧菜单均支持浅色和深色模式；业务提示未明确要求深色时，必须使用浅色模式。
 - 主体右侧：面包屑、页面标题、页面操作和功能内容区。
 - 应用切换后必须同步替换左侧应用菜单并进入该应用默认页；应用、菜单、默认路由和权限共用一份元数据。
 - 顶部可直接展示少量常用应用；应用超过直显数量后，使用“全部应用”入口，以分类悬浮卡片展示和切换应用。
 - 优先使用 Ant Design 公开布局与菜单能力，不重复开发菜单展开、选中、收起和键盘交互。
 
 应用骨架结构固定；可配置项主要限定为颜色、字号、间距、边框、圆角、阴影和 Ant Design 组件 Token。只有用户明确提出不同信息架构时才改变骨架。
+
+主品牌色固定为 `#2A56DE`，用于链接、可交互字段和主按钮；辅助色固定为 `#FF6B06`，仅用于特殊强调和个别标签，不替代主交互色。
 
 ## 按边界实现
 
@@ -111,16 +113,6 @@ python3 scripts/apply_standards.py \
 
 禁止直接修改生成文件；应修改 JSON 后重新生成。
 
-同时生成项目级中文设计入口：
-
-```bash
-python3 scripts/generate_design_md.py \
-  --config .b2b/b2b-standards.json \
-  --output DESIGN.md
-```
-
-若项目提供 `npm run generate:standards`，优先使用该命令一次生成 Theme、TypeScript 配置和 `DESIGN.md`。
-
 ## 实现要求
 
 - 使用 TypeScript 和明确领域类型，不用 `any` 掩盖不确定性。
@@ -131,14 +123,20 @@ python3 scripts/generate_design_md.py \
 - 明确处理加载、空、失败、无权限和成功状态。
 - 尽早校验；可恢复错误发生后保留用户输入。
 - 危险或不可逆操作必须明确确认并说明影响。
-- 所有按钮组统一将主操作放在最左侧，次操作依次向右排列。
+- 页面内容区、筛选区、表格和独立表单默认流式占满可用宽度，并使用统一响应式页面留白；不得在业务页面写死整体容器宽度。表格列、弹窗、抽屉和阅读型内容可按语义设置宽度、最小宽度或最大阅读宽度。
+- 按钮顺序按场景确定：弹窗／抽屉提交区使用“取消 → 保存”并整体右对齐；列表查询区使用带标准图标的“查询 → 重置 → 展开”描边按钮组并整体右对齐；表格顶部工具栏采用“只读文本居左、操作按钮组居右”，按钮组内按危险／次要到正向主动作排列。行内操作单独按“详情 → 编辑 → 复制 → 启用／禁用 → 删除”排列，删除始终最右并使用危险色。完整规则读取 `references/interaction-rules.md`。
+- 列表筛选内容与表格内容左对齐；表格采用“左侧只读信息、右侧操作”，导航链接可保留在信息列，变更类动作集中在最右侧且右对齐。
+- 表格默认一列对应一个明确字段，不无条件将头像、名称、邮箱等组合为复合字段；只有身份识别等明确业务场景允许组合。
+- 表格根据字段内容与可用列宽自动判断溢出，超长字段显示省略号，并在 Hover 或键盘聚焦时用 Tooltip 展示全文；不得遮挡相邻字段或操作列。
+- 表头所有单元格统一使用 Table `headerBg` Token；Select 使用 Ant Design 公开组件并保留规范箭头尾部间距，不使用原生下拉或内部 DOM 覆盖箭头位置。
+- 表单容器自适应可用宽度，输入框与下拉框根据字段内容长度、输入预期和页面布局选择语义宽度，不将短字段控件全局拉满。
 - 只使用 Ant Design 公开 API 和 Token，不依赖内部 DOM 或未公开实现。
 - 保留用户已有修改，遵循项目的格式化、Lint 和测试约定。
 
 ## 交付前验证
 
 1. 运行与改动相关的类型检查、Lint 和测试。
-2. 项目包含 React／TSX 页面时，运行 `python3 scripts/check_ui_conformance.py --root <项目目录>`；它同时检查 `DESIGN.md` 是否与 JSON 同步，任何违规都必须阻止交付。
+2. 项目包含 React／TSX 页面时，运行 `python3 scripts/check_ui_conformance.py --root <项目目录>`；任何规范违规都必须阻止交付。
 3. 验证主流程以及加载、空、校验、权限和失败状态。
 4. 检查键盘操作、弹窗关闭后的焦点回归、标签、对比度和窄屏溢出。
 5. 确认设计值来自共享规范，不是散落的无解释字面量。
@@ -152,10 +150,7 @@ python3 scripts/generate_design_md.py \
 1. 复制到 `.b2b/b2b-standards.json`。
 2. 修改 Token 或行为配置。
 3. 使用 `--check` 校验。
-4. 运行 `npm run generate:standards`，重新生成主题、TypeScript 配置和 `DESIGN.md`。
-5. 运行 `npm run check:standards`，确认生成文件未过期且页面符合规范。
-6. 检查有代表性的列表、表单、详情和危险操作流程。
-
-`b2b-standards.json` 是唯一需要人工维护的配置源。`DESIGN.md` 只供 Agent 阅读，文件顶部标明自动生成，禁止直接修改。
+4. 重新生成主题文件。
+5. 检查有代表性的列表、表单、详情和危险操作流程。
 
 `references/design-source.md` 登记的 CoDesign 项目入口是在线设计规范总源，8 个演示页是可定位的子页面。先从项目入口核对设计稿数量和版本，再按子页面逐项同步；无法读取页面内容时，不得猜测颜色、字号、间距等数值，应标记为“待同步”。新增规范时，同时更新 JSON、`scripts/apply_standards.py` 中的校验逻辑和对应中文规范文档。调整应用外壳或导航时，必须读取 `references/architecture.md` 中的“统一应用骨架”。

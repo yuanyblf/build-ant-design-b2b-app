@@ -30,17 +30,20 @@
   "product": {
     "locale": "zh-CN",
     "density": "middle",
-    "contentMaxWidth": 1440,
+    "contentWidthMode": "fluid",
+    "contentWidth": "100%",
+    "allowReadableContentMaxWidth": true,
     "pageGutter": 24,
-    "pageGutterCompact": 16
+    "pageGutterCompact": 16,
+    "uniformOuterGutter": true
   },
   "theme": {
     "token": {
-      "colorPrimary": "#1677ff",
+      "colorPrimary": "#2A56DE",
       "colorSuccess": "#52c41a",
       "colorWarning": "#faad14",
       "colorError": "#ff4d4f",
-      "colorInfo": "#1677ff",
+      "colorInfo": "#2A56DE",
       "colorText": "#171A1D",
       "colorTextSecondary": "#747677",
       "colorTextTertiary": "#A2A3A5",
@@ -50,11 +53,36 @@
       "controlHeight": 32,
       "wireframe": false
     },
+    "customToken": {
+      "colorSecondary": "#FF6B06"
+    },
+    "colorUsage": {
+      "interactive": "colorPrimary",
+      "secondary": ["special-emphasis", "individual-tags"]
+    },
+    "navigation": {
+      "defaultMode": "light",
+      "modes": {
+        "light": {
+          "headerBg": "#FFFFFF",
+          "siderBg": "#FFFFFF",
+          "headerTextColor": "#171A1D",
+          "menuTheme": "light"
+        },
+        "dark": {
+          "headerBg": "#001529",
+          "siderBg": "#001529",
+          "headerTextColor": "#FFFFFF",
+          "menuTheme": "dark"
+        }
+      }
+    },
     "components": {
-      "Layout": { "headerBg": "#FFFFFF", "siderBg": "#FFFFFF", "bodyBg": "#F5F6F8", "headerHeight": 50 },
+      "Layout": { "bodyBg": "#F5F6F8", "headerHeight": 50 },
       "Menu": { "itemHeight": 40, "itemBorderRadius": 6, "itemMarginInline": 8 },
-      "Table": { "cellPaddingBlock": 12, "cellPaddingInline": 12 },
+      "Table": { "cellPaddingBlock": 12, "cellPaddingInline": 12, "headerBg": "#FAFAFA" },
       "Form": { "itemMarginBottom": 20 },
+      "Select": { "showArrowPaddingInlineEnd": 18 },
       "Modal": { "titleFontSize": 16 },
       "Button": { "paddingInline": 15 },
       "Card": { "paddingLG": 24 }
@@ -106,10 +134,27 @@
     "actionsMaxVisible": 3,
     "emptyText": "暂无数据",
     "fixedActionColumn": true,
+    "containerWidth": "fill-available",
+    "allowSemanticColumnWidth": true,
+    "allowHorizontalScrollBelowMinimum": true,
+    "columnLayout": "information-left-actions-right",
+    "dataColumnsReadOnly": true,
+    "singleFieldPerColumnByDefault": true,
+    "compositeFieldRequiresExplicitScenario": true,
+    "allowNavigableLinksInDataColumns": true,
+    "actionColumnSide": "right",
+    "actionColumnAlign": "right",
+    "headerBackgroundToken": "Table.headerBg",
+    "headerBackgroundConsistent": true,
+    "autoMeasureLongContent": true,
+    "longContentOverflow": "ellipsis-with-tooltip",
+    "preventContentOverlap": true,
     "resizableLongContentColumn": true
   },
   "form": {
     "layout": "horizontal",
+    "containerWidth": "fill-available",
+    "controlWidth": "semantic-adaptive",
     "labelWrap": false,
     "requiredMark": true,
     "validateTrigger": "onBlur",
@@ -127,13 +172,46 @@
   },
   "components": {
     "primaryButtonMaxPerModule": 1,
-    "primaryActionPosition": "left",
     "buttonFallbackEmphasis": "secondary",
     "buttonStates": ["default", "hover", "active", "disabled", "loading"],
     "buttonPatterns": ["plain", "dropdown", "leadingIcon"],
     "dropdownPatterns": ["simple", "multiple", "grouped", "withIcon", "withDescription"],
     "toastPatterns": ["plain", "withIcon", "success", "error", "loading", "closable"],
-    "snackbarActionable": true
+    "snackbarActionable": true,
+    "actionGroups": {
+      "formSubmit": {
+        "align": "right",
+        "order": ["secondary", "primary"],
+        "example": ["取消", "保存"]
+      },
+      "listQuery": {
+        "align": "right",
+        "order": ["primary-business", "utility", "view-toggle"],
+        "example": ["查询", "重置", "展开"],
+        "allowSeparateViewToggle": true,
+        "buttons": [
+          { "action": "query", "label": "查询", "icon": "SearchOutlined", "variant": "primary" },
+          { "action": "reset", "label": "重置", "icon": "ReloadOutlined", "variant": "default" },
+          { "action": "expand-collapse", "label": "展开/收起", "icon": "DownOutlined/UpOutlined", "variant": "default" }
+        ]
+      },
+      "tableToolbar": {
+        "layout": "information-left-actions-right",
+        "informationAlign": "left",
+        "actionsAlign": "right",
+        "order": ["danger-or-secondary", "positive-primary"],
+        "example": ["批量删除", "导出", "新增"]
+      },
+      "tableRow": {
+        "align": "right",
+        "order": ["detail", "edit", "copy", "enable-disable", "delete"],
+        "operationColumn": "right",
+        "deletePosition": "last",
+        "deleteEmphasis": "danger",
+        "statusActionMutuallyExclusive": true,
+        "overflowMode": "more-menu-preserve-order"
+      }
+    }
   },
   "pagePatterns": {
     "menuDefaultTarget": "list",
@@ -155,14 +233,19 @@
       "queryActionsAlign": "right-center",
       "queryResponsiveColumns": [4, 2, 1],
       "queryActionsStayRowEnd": true,
+      "queryTableContentLeftAligned": true,
+      "containerWidth": "fill-available",
+      "uniformOuterGutter": true,
       "showTableTitle": false,
-      "tableActionsPosition": "header-left",
+      "tableToolbarLayout": "information-left-actions-right",
+      "tableInformationPosition": "header-left",
+      "tableActionsPosition": "header-right",
       "queryOrder": "table-column-order",
       "dateRangeDefault": true,
       "dateRangeRequired": false,
       "requiredHint": "tooltip-on-query",
       "linkNavigableContent": true,
-      "longContent": "show-all-unless-specified",
+      "longContent": "auto-ellipsis-with-tooltip",
       "leftTreeFilter": {
         "applicableTo": "hierarchical-dimension",
         "panel": {
@@ -200,7 +283,7 @@
     "formItemLayout": "label-control-inline",
     "formLabelWidth": 112,
     "formLabelWrap": false,
-    "formControlWidth": "fill",
+    "formControlWidth": "semantic-adaptive",
     "formNarrowLayout": "vertical",
     "advancedFormStickyFooter": true,
     "detailTypes": ["basic", "advanced"],
@@ -228,7 +311,8 @@
       "fieldHelpRequired": true,
       "cancelText": "取消",
       "confirmText": "确认",
-      "confirmOnLeft": true
+      "footerAlign": "right",
+      "footerOrder": ["cancel", "confirm"]
     },
     "createEditSurface": {
       "modalMaxFields": 6,
